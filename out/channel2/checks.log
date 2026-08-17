@@ -44,3 +44,8 @@ PASS	task9.derived-quantities-are-invariant-to-the-reporting-rate	every derived 
 PASS	task9.objective-does-vary-so-the-grid-is-live	the objective takes 56-56 distinct values per member over the same evaluations, so the null is not a dead harness
 PASS	task9.removal-channel-does-not-move-F-at-frozen-parameters	max |F/F_MSY(exclude) - F/F_MSY(include)| at the same X-hat = 0
 FAIL	task9.fixed-parameter-profile-can-decompose-the-downstream-effect	it cannot: dF/dX and the removal channel are both structurally zero at frozen parameters, so the observed -18% arm effect on F/F_MSY is an estimation effect and only re-estimation can decompose it
+PASS	task10.no-unexplained-objective-term-under-exclude	exclude: the objective is fully accounted for by the tag blocks and the reporting-rate penalty -- max unexplained range 7.65e-07 objective units across all profiles
+PASS	task10.large-unexplained-objective-term-under-include-at-low-X	include: max unexplained term 1.907e+05 objective units (median across profiles 4791); this is the posfun survival-floor penalty, which has no other candidate source
+PASS	task10.unexplained-term-concentrates-at-low-X	include: the unexplained term peaks at X = [0.3] -- i.e. where the raised removal R/X is largest, which is where the cap must engage
+FAIL	task10.unexplained-term-vanishes-above-X-0.8	include: unexplained term range above X = 0.8 is 2.7 -- the cap does not engage there, which is why the cancellation is exact in that sub-range
+PASS	task10.binary-carries-the-cap-and-honours-the-flag	resolves the SC22 open question empirically: the 2.2.7.9 binary both honours tag_flags(i,2) (the arms differ) and applies the posfun cap (an unexplained penalty term appears under `include` at low X only)

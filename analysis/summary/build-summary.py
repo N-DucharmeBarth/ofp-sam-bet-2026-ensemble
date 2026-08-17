@@ -94,6 +94,21 @@ def main():
     p_exc = psi[psi.scheme.str.startswith("1.")].psi_release_weighted.median()
     psi_k = pd.read_csv(os.path.join(C2, "psi-by-mixing-configuration.csv"))
 
+    # floor isolation + prevalence (the sharpened-recommendation numbers)
+    fi = pd.read_csv(os.path.join(C2, "floor-penalty-isolation.csv"))
+    prof["resid"] = prof.objective - (prof.tag_mix + prof.tag_post + prof.rr_penalty)
+    at_fit = []
+    for (m, g), s2 in prof[prof.arm == "include"].groupby(["member_id", "group_id"]):
+        s2 = s2.sort_values("X")
+        r = (s2.resid - s2.resid.min()).values
+        at_fit.append(r[int(np.argmin(np.abs(s2.X.values - s2.base_rate.iloc[0])))])
+    sys.path.insert(0, os.path.join(REPO, "analysis", "rr-penalty"))
+    from parpar import parse_all  # noqa: E402
+    pars = parse_all(os.path.join(REPO, "final-par"))
+    n_win = int(np.median([(p.tag_flags[:, 0] > 0).sum() for p in pars
+                           if p.arm == "exclude"]))
+    n_floor = float(fl_inc.n_engaging.median())
+
     subs = {
         "N_CHECKS": str(len(all_ck)),
         "N_PASS": str(n_pass),
@@ -139,6 +154,12 @@ def main():
         "PSI_PCT": f"{100*(p_ext-p_exc)/p_exc:.1f}",
         "PSI_KSPAN": f"{psi_k.psi_rw_median.max()-psi_k.psi_rw_median.min():.3f}",
         "PSI_FACTOR": f"{(psi_k.psi_rw_median.max()-psi_k.psi_rw_median.min())/abs(p_ext-p_exc):.0f}",
+        "FLOOR_AT_FIT": f"{max(at_fit):.2f}",
+        "FLOOR_AT_LOWX": f"{fi[fi.arm=='include'].resid_range.max():,.0f}",
+        "FLOOR_EXC_RESID": f"{fi[fi.arm=='exclude'].resid_range.max():.1e}",
+        "N_WIN": str(n_win),
+        "N_FLOOR": f"{n_floor:.0f}",
+        "PREVALENCE_RATIO": f"{n_win/n_floor:.0f}",
         "FIG_PROFILE": img(os.path.join(C2, "figures", "profile-by-arm-g7.png")),
         "FIG_DOWNSTREAM": img(os.path.join(C2, "figures", "downstream-arm-effects.png")),
         "FIG_DISSOC": img(os.path.join(C2, "figures", "excursion-vs-Nmix-by-arm.png")),
