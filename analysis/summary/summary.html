@@ -731,6 +731,61 @@ that either held or did not, and failures are reported in the same form as passe
     </div>
   </div>
 
+  <h3>Both settings estimate reporting rates above the external evidence</h3>
+
+  <p>The two options are sometimes described as bracketing the reporting-rate adjustment: not
+  correcting is equivalent to assuming RR = 1, which applies the smallest possible raising factor of
+  1.00, while correcting applies 1/X̂ &gt; 1. That framing holds only if X̂ is exogenous. It is not —
+  X̂ is estimated inside the same likelihood, and in this assessment it lands well above the
+  tag-seeding evidence in <strong>both</strong> arms.</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Priored group</th><th class="num">Seeding-trial RR</th>
+      <th class="num">Fitted, <span class="arm-i">include</span></th>
+      <th class="num">Fitted, <span class="arm-e">exclude</span></th>
+      <th class="num">Raising applied, widest option</th>
+      <th class="num">Raising implied by seeding</th></tr></thead>
+    <tbody>
+      <tr><td class="lead">7 · RTTP PS.2</td><td class="num">0.496</td><td class="num">0.524</td><td class="num">0.666</td><td class="num">1.91</td><td class="num up">2.02</td></tr>
+      <tr><td class="lead">10 · RTTP PS.WEST.3</td><td class="num">0.512</td><td class="num">0.579</td><td class="num">0.588</td><td class="num">1.73</td><td class="num up">1.95</td></tr>
+      <tr><td class="lead">14 · PTTP PS.2</td><td class="num">0.496</td><td class="num">0.502</td><td class="num">0.502</td><td class="num">1.99</td><td class="num up">2.02</td></tr>
+      <tr><td class="lead">17 · PTTP PS.WEST.3</td><td class="num">0.512</td><td class="num">0.768</td><td class="num">0.783</td><td class="num">1.30</td><td class="num up">1.95</td></tr>
+      <tr><td class="lead">18 · PTTP PS.EAST.3</td><td class="num">0.528</td><td class="num">0.815</td><td class="num">0.900</td><td class="num">1.23</td><td class="num up">1.89</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>In <strong>5 of 5</strong> priored groups the raising implied by the seeding trials exceeds what
+  either option applies. For groups 17 and 18 — the two that dominate the penalty — the widest option
+  raises by 1.30 and 1.23 against seeding-implied factors of 1.95 and 1.89.</p>
+
+  <p>The pattern is diagnostic rather than incidental. Group 14 is the one case where the applied
+  raising nearly reaches the seeding value (1.99 against 2.02) — and group 14 has <strong>six</strong>
+  in-window recaptures, too few to move its rate off the prior. Where the tag data is abundant enough
+  to move X̂, X̂ rises and the gap to the external evidence opens. So the span between the two options
+  is a span in the <em>fitted</em> adjustment, and the fitted adjustment is itself displaced upward
+  relative to the independent seeding estimates.</p>
+
+  <h3>Removing the feedback into the tagged population does not remove the influence on the fit</h3>
+
+  <p>A natural defence of the uncorrected setting is that it avoids circularity: with no correction,
+  none of the parameters estimated from the tag likelihood influence the tagged population abundance at
+  the end of the mixing period, so that abundance — which drives all post-mixing predictions — is not
+  contaminated by the reporting rate. That is true as far as it goes, and it is the design intent.</p>
+
+  <p>But it tracks influence in one direction only. The mixing-period <em>likelihood terms still
+  exist</em> under both settings, and under the uncorrected setting they contain X̂ while their
+  predictions are built from the observed returns. So the mixing-period data continues to influence
+  <strong>X̂</strong> even though X̂ no longer influences the tagged population. And X̂ is not confined
+  to the mixing period: it scales every predicted recapture <em>outside</em> the window as well. The
+  path runs mixing-period returns → X̂ → post-mixing predictions → the tag likelihood, and it is not
+  closed by breaking the feedback into the cohort.</p>
+
+  <p>The circularity is therefore cut in one direction and left open in the other, and the direction
+  left open is the one that carries the bias — because those in-window terms are minimised at X̂ = 1
+  regardless of what the data say.</p>
+
   <div class="verdict">
     <h3>The recommendation</h3>
 
