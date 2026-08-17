@@ -666,6 +666,29 @@ that either held or did not, and failures are reported in the same form as passe
   the removal is deterministic, it carries <em>more</em> authority than fitted data would: a fitted
   observation can be outweighed by other information, a deterministic constraint cannot.</p>
 
+  <h3>The influence does not stay inside the mixing window</h3>
+
+  <p>It is worse than a contained problem, and this is a source fact, not an inference.
+  <code>tag_fish_rep</code> — the estimated reporting rate X̂ — is a single free parameter per
+  (release group, fishery) cell, not one value per period. The likelihood-scoring loop in
+  <code>src/tagfit.cpp</code> runs every period from release onward with no branch on it,
+  <code>for (ip = initial_tag_period; ip &lt;= ub; ip++)</code>, and applies the identical multiplier —
+  <code>tag_rep_rate(it,ir,ip,fi) * tagcatch(it,ir,ip,fi)</code> — at each one, mixing and post-mixing
+  alike; <code>tag_rep_rate</code> resolves to <code>tag_fish_rep(it, pp)</code>, a function of release
+  group and fishery only, never of the period <code>ip</code>. So whatever pull the mixing-period
+  pseudo-data puts on X̂ under <span class="arm-e">exclude</span> is carried, completely unchanged, into
+  the predictions the model compares against the genuinely-fitted post-mixing recaptures for that same
+  cell — the parameter contaminated in the window it was meant to protect is the same parameter used to
+  score real data outside it.</p>
+
+  <p>This is exactly what Part 2's <code>N_mix</code>/<code>N_post</code> double dissociation shows
+  empirically: the same X̂ responds to both mixing-period and post-mixing recapture counts at once, with
+  the mixing-period component pulling harder under <span class="arm-e">exclude</span> and the
+  post-mixing component pulling less — one parameter, contested between contaminated and genuine
+  evidence, and the contaminated side wins more of that contest under <span class="arm-e">exclude</span>.
+  Confining the damage to a few free parameters would already be a problem; parameters that are then
+  used, unmodified, to score real data is worse.</p>
+
   <p>This was a reasonable response to a real difficulty — tagged fish are not mixed, so predicting
   their recaptures from population-average availability is knowingly wrong, and declining to fit them is
   defensible. But unlike a data series that can simply be dropped, these fish have left the tagged
