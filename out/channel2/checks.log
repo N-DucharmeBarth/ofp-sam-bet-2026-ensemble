@@ -39,3 +39,8 @@ PASS	task1.argmin-shift-positive-in-every-member[g7]	group 7: shifts ['+0.1667',
 FAIL	task1.argmin-shift-positive-in-every-member[g17]	group 17: shifts ['-0.0556', '+0.0000', '+0.0000'] (median +0.0000)
 PASS	task1.argmin-shift-larger-for-the-lower-weight-group	median argmin shift: group 7 (w=354.5) +0.1667 vs group 17 (w=739.2) +0.0000 -- the same ordering as the observed ensemble arm differences (+0.142 vs +0.014)
 PASS	task1.profile-shift-scales-with-mixing-window	median argmin shift +0.0833 at K=0.05 vs +0.0556 at K=0.3; Spearman(K, shift) = -0.121
+PASS	task9.derived-quantities-present-in-every-evaluation	['agg_F_Fmsy', 'agg_F', 'SB_SBmsy', 'SB_recent', 'MSY', 'F_at_MSY'] complete in 168/168 evaluations
+PASS	task9.derived-quantities-are-invariant-to-the-reporting-rate	every derived quantity takes exactly 1 value per member across 56 evaluations spanning 14 reporting rates and both arms
+PASS	task9.objective-does-vary-so-the-grid-is-live	the objective takes 56-56 distinct values per member over the same evaluations, so the null is not a dead harness
+PASS	task9.removal-channel-does-not-move-F-at-frozen-parameters	max |F/F_MSY(exclude) - F/F_MSY(include)| at the same X-hat = 0
+FAIL	task9.fixed-parameter-profile-can-decompose-the-downstream-effect	it cannot: dF/dX and the removal channel are both structurally zero at frozen parameters, so the observed -18% arm effect on F/F_MSY is an estimation effect and only re-estimation can decompose it

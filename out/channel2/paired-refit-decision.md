@@ -1,7 +1,17 @@
 # Paired refit — recommendation
 
-**Recommendation: do not launch paired refits yet. Close two gaps first, then a six-member refit
-becomes worth its compute.** No estimation run was launched for this issue.
+**Recommendation (revised): a paired refit is the only instrument that can answer the downstream
+question. The cheaper alternative I proposed does not exist.** No estimation run has been launched.
+
+> **Revision note.** The first version of this memo recommended extending the Task 1 profile to record
+> F, on the reasoning that ~40 minutes of evaluation would settle the pathway before spending refit
+> compute. That extension has now been run (168 evaluations) and it **returns an exact structural
+> null**: across every reporting rate and both arms, F, F/F_MSY, SB/SB_MSY and SB_recent each take
+> **exactly one value per member**, while the objective takes 56. `tag_fish_rep` enters only the tag
+> likelihood, the reporting-rate penalty and the tagged-cohort Newton-Raphson; the tagged cohort is
+> fitted *to* the population and does not feed back into population numbers or fishing mortality. With
+> parameters frozen there is no channel by which X-hat can move F. The proposal was wrong, and the
+> conclusion it was meant to support has flipped.
 
 ## The triggers, evaluated literally
 
@@ -23,39 +33,35 @@ whose stated reasoning does not apply. I am not rewriting the trigger; I am repo
 pattern falls outside the space it was written for, and recommending on the two concrete gaps below
 instead.
 
-## Why not now
+## What the null establishes, and why it forces the refit
 
-1. **The decomposition cannot carry the weight the refit is meant to relieve.** X̂ and F are jointly
-   estimated, so conditioning on X̂ is a decomposition of covariation, and the >100% indirect shares
-   are a symptom of that. A refit is supposed to replace this step with a within-pair contrast — but
-   the case for spending compute rests on the decomposition being *informative and ambiguous*, and
-   right now it is *uninformative*. That is not a reason to spend compute; it is a reason to first
-   establish that the pathway can be measured at all.
+The structural null is not a wasted run. It rules out a whole class of explanation for the observed
+−18% arm effect on F/F_MSY: it is **not** an arithmetic or reporting consequence of how F is computed
+from a fitted model. Freeze the parameters and the effect is exactly zero. So the effect is
+*optimiser behaviour* — X̂ reshapes the likelihood surface and the F-related parameters relocate.
 
-2. **The ψ̂ level does not reconcile with the published diagnostic** (K = 0.30 gives ψ̂ = 0.226 against
-   the published 0.231, but 35 groups at ψ̂ ≥ 0.3 against 27). Until that is closed, an externally
-   circulated correction cannot be stated, and the refit's main external payoff is unavailable.
+That is precisely the thing only re-estimation can measure. There is no cheap instrument standing
+between the observational association and a refit:
 
-3. **There is a cheaper result already in hand that has not been actioned.** The
-   `get_rep_rate_correction` discrepancy means the tag-fit diagnostics circulated to SC are computed
-   on a different scaling from the fit — a **21.6%** median shortfall under the configured `exclude`
-   setting. That needs no compute, and it should be resolved before spending any.
+| Instrument | Can it decompose the −18%? |
+|---|---|
+| Conditioning on X̂ (Task 5) | No — X̂ and F jointly estimated; over-mediates, >100% indirect shares |
+| Fixed-parameter profile (Task 1 + this extension) | **No — dF/dX̂ is structurally zero** |
+| Paired refit | Yes — it is the only design that lets the optimiser move |
 
-## What would change this
+## Sequencing
 
-Close both gaps, and a refit becomes worth it:
+Two things should still happen first, both zero-compute, because they change what a refit would be
+reported alongside:
 
-- **Reconcile the ψ̂ baseline** against `tag-flags-implications-bet-2026.md` — recover the exact mixing
-  configuration and group-counting convention behind 0.231 / 27 groups. No compute.
-- **Extend Task 1 to the F pathway.** The profile currently records the objective and its tag blocks.
-  Record derived F at each grid point too, and the fixed-parameter experiment answers directly what
-  the observational decomposition cannot: how much does F move per unit X̂ with everything else frozen?
-  That is ~170 more evaluations, about **40 minutes** at the measured 14 s each — two orders of
-  magnitude cheaper than a refit, and it either establishes the pathway or shows the arm effect is
-  carried by something else. **Do this before any refit.**
+1. **Report the `get_rep_rate_correction` behaviour upstream.** The in-window tag-fit panels are an
+   identity in both arms (verified against the circulated `plot.rep`: time-at-liberty bin 1 gives
+   pred/obs of 1.0000–1.0207 across arms), and under `exclude` the objective scored something 21.6%
+   different from what was plotted. This is an MFCL defect, not a configuration choice.
+2. **Reconcile the ψ̂ baseline** against `tag-flags-implications-bet-2026.md` — the K = 0.30
+   configuration gives ψ̂ = 0.226 against the published 0.231, but 35 groups at ψ̂ ≥ 0.3 against 27.
 
-If that extension shows F moving with X̂ at fixed parameters, then the paired refit is the right next
-step and the design below applies.
+Neither blocks the refit; both should land before its results are circulated.
 
 ## The design, if it goes ahead
 

@@ -22,6 +22,7 @@ if [ "${C2_RUN_MFCL:-0}" = "1" ]; then
 fi
 if [ -f out/channel2/profile-objective.csv ]; then
   python3 "$here/17-profile-analysis.py"
+  python3 "$here/19-F-pathway.py"
 else
   echo "skipping profile analysis: no profile-objective.csv (set C2_RUN_MFCL=1)"
 fi

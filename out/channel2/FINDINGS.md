@@ -1,6 +1,6 @@
 # Channel 2 — does `exclude` inflate estimated reporting rates, and does it propagate?
 
-Code: `analysis/channel2/`. Checks: `out/channel2/checks.log` (31 held, 10 did not).
+Code: `analysis/channel2/`. Checks: `out/channel2/checks.log` (35 held, 11 did not).
 Every directional claim below names a check, reported in the same form whether it held or not.
 
 **Experimental vs observational.** Task 1 is a fixed-parameter experiment — 168 MFCL evaluations at
@@ -237,7 +237,36 @@ is unreconciled. That gap should be closed before any of this is circulated.
 
 ---
 
-## 8. What this establishes, and what it does not
+## 8. Task 9 — the F pathway is structurally invisible at frozen parameters
+
+`F-invariance.csv`. The profile grid was re-run recording aggregate F, F/F_MSY, SB/SB_MSY and recent
+adult biomass at every point. The result is an **exact structural null**:
+
+| quantity | distinct values per member, over 56 evaluations |
+|---|---|
+| F / F_MSY, aggregate F, SB / SB_MSY, SB recent, MSY, F at MSY | **1** |
+| total objective (control) | **56** (relative spread 1.94) |
+
+`task9.derived-quantities-are-invariant-to-the-reporting-rate` **held**;
+`task9.removal-channel-does-not-move-F-at-frozen-parameters` **held** — max |F/F_MSY(exclude) −
+F/F_MSY(include)| at the same X̂ is **0**, not small. `task9.objective-does-vary-so-the-grid-is-live`
+**held**, so this is not a dead harness.
+
+The reason is in the source trace: `tag_fish_rep` enters only the tag likelihood, the reporting-rate
+penalty, and the Newton–Raphson target for the tagged cohort. The tagged cohort (`tagnum_fish`) is
+fitted *to* the population; it does not feed back into population numbers or fishing mortality. With
+every estimated parameter frozen there is no channel by which X̂ can move F.
+
+`task9.fixed-parameter-profile-can-decompose-the-downstream-effect` **did not hold, by construction.**
+
+**What the null does establish.** The observed −18% arm effect on F/F_MSY is *not* an arithmetic or
+reporting consequence of how F is computed from a fitted model — freeze the parameters and it is
+exactly zero. It is optimiser behaviour: X̂ reshapes the likelihood surface and the F-related
+parameters relocate. That rules out a class of explanation, and it means no fixed-parameter experiment
+can decompose the pathway. Only re-estimation can. See `paired-refit-decision.md`, which is revised
+accordingly.
+
+## 9. What this establishes, and what it does not
 
 - **Established experimentally (Task 1):** channel 2 operates in MFCL. The `include` cancellation is
   exact to 0.09% where the survival floor is inactive; the `exclude` mixing block slopes to `X̂ = 1`
@@ -249,7 +278,18 @@ is unreconciled. That gap should be closed before any of this is circulated.
   post-mixing returns, sits `exclude` systematically closer to the bound, and covaries with a −18% /
   +20% arm effect on F and depletion.
 - **Not established:** that the downstream effect is *caused* by the reporting rate. Both channels push
-  F the same way and compound; the ensemble is observational and not fully crossed; and the X̂
-  decomposition over-mediates, which is a symptom of joint estimation rather than a measurement.
-- **Neither arm's rates are truth.** `include` deactivates channel 2 but engages the survival floor in
-  100% of members and keeps the removal feedback active. The external anchor is the seeding priors.
+  F the same way and compound; the ensemble is observational and not fully crossed; the X̂
+  decomposition over-mediates; and the fixed-parameter profile is structurally blind to it (§8). This
+  is now known to require re-estimation, not merely to be unresolved.
+- **The two arms are not symmetric on the reporting rate, and an earlier framing here overstated the
+  symmetry.** Under `exclude`, channel 2 acts on *every* release group with a mixing window. Under
+  `include`, the in-window terms are algebraically inert in X̂ — except where the survival floor
+  engages, and there the rescaled target `kr·R/X̂` with `kr ∝ X̂` restores predicted returns of
+  `≈ X̂·R`, the same form as `exclude`. That is why the `include` profile slopes at low X̂ and is flat
+  at high X̂: channel 2 leaking back in through the floor. The floor engages on a median of **2 of 98**
+  release groups per `include` member, against every windowed release group under `exclude`. So the
+  contamination is pervasive in one arm and localised in the other — an argument for `include` with a
+  caveat, not for treating the arms as equivalent.
+- **`include` is still not clean.** The floor distorts the tag cohort dynamics where it engages, and
+  MFCL discards the resulting `posfun` penalty outright for release group 21, one of the engaging
+  groups. The externally defensible anchor remains the seeding priors, not either arm's fitted rates.
