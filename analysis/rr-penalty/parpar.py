@@ -140,10 +140,12 @@ def parse_par(path: str) -> ParTagBlocks:
     with open(path) as fh:
         lines = fh.read().split("\n")
 
+    # Member id comes from the containing ensemble-NNN directory. PARs read
+    # from scratch directories (the channel-2 profiling runs) have no member
+    # id; they get -1 rather than failing, since nothing downstream of those
+    # joins on it. parse_all() only ever sees ensemble-* paths.
     m = re.search(r"(\d+)\s*$", os.path.basename(os.path.dirname(path)))
-    if not m:
-        raise ParError(f"cannot derive member id from {path}")
-    member_id = int(m.group(1))
+    member_id = int(m.group(1)) if m else -1
 
     idx = _find_headers(lines, set(TAG_BLOCKS))
     order = sorted(idx.items(), key=lambda kv: kv[1])

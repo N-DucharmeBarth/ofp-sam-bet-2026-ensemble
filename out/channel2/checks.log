@@ -1,0 +1,41 @@
+PASS	task3.panel-is-member-by-group-not-five-rows	80 x 12 = 960 rows
+PASS	task3.N_mix-varies-within-group-across-members	9 of 12 groups have non-zero N_mix variation across members
+PASS	task3.Nmix-pull-is-exclude-specific-controlling-for-Npost	N_mix x arm = 3.381e-05 [1.243e-05, 5.519e-05], p=0.00203; implied N_mix slope 9.868e-05 (include) -> 1.325e-04 (exclude)
+FAIL	task3.Npost-pull-is-not-arm-specific	N_post x arm = -2.164e-05 [-3.684e-05, -6.434e-06] -- CI excludes zero (placebo expectation was arm-invariance)
+PASS	task3.Nmix-and-Npost-arm-effects-have-opposite-signs	N_mix slope 9.868e-05 -> 1.325e-04 (+34%) while N_post slope 6.177e-05 -> 4.014e-05 (-35%); both interaction CIs exclude zero
+PASS	task3.Nmix-over-w-orders-excursion-within-exclude	exclude arm: N_mix/w coefficient 0.0473 [0.04276, 0.05184], p=1.91e-49
+PASS	task3.Nmix-over-w-association-weaker-under-include	include arm coefficient 0.03782 [0.0323, 0.04334] vs exclude 0.0473
+PASS	task3.association-attenuates-under-include	arm x N_mix/w interaction 0.00948 [0.002459, 0.0165], p=0.0083 (positive = association stronger under exclude)
+PASS	task3.count-beats-share-as-the-ordering-variable	within-member R^2 under exclude: N_mix 0.7753 vs psi_hat 0.2806
+PASS	task3.psi-hat-association-is-negative-not-positive	exclude arm psi_hat coefficient -0.2744 [-0.344, -0.2048] -- groups with a HIGHER in-window share show a SMALLER excursion, opposite to a naive psi-hat account
+PASS	task4.upper-bound-constant	{0.99}
+FAIL	task4.bound-contact-test-in-transformed-space	proportion scale: include 5.9% vs exclude 0.0%; estimation scale: include 5.9% vs exclude 0.0% -- ordering does not reverse
+PASS	task4.exclude-is-closer-to-the-bound-in-median-despite-no-contact	group 18 median transformed gap: include 215 vs exclude 149.7 (smaller = closer to the bound)
+PASS	task4.exclude-closer-to-bound-across-all-priored-groups	median transformed gap over all priored groups: include 359.6 vs exclude 308.6
+PASS	task4.include-bound-contacts-are-upper-tail-outliers	2 include-arm group-18 estimates exceed the exclude-arm maximum (0.9866); include median 0.8146 sits below the exclude median 0.9004
+PASS	task5.management-quantities-cover-all-88	depletion available for 88 of 88 design rows
+PASS	task5.aggregate-F-coverage-matches-the-80-par-members	aggregate F available for 80 members; 80 have a retained par
+PASS	task5.arm-effect-on-F-is-negative[f_recent_fmsy]	F/F_MSY: -0.1664 [-0.2347, -0.09819], p=5.83e-06 (mean 0.9007)
+PASS	task5.arm-effect-on-F-is-negative[agg_F]	aggregate F: -0.01268 [-0.02049, -0.004875], p=0.00182 (mean 0.06312)
+PASS	task5.arm-effect-on-depletion-is-positive	SB/SB_0: +0.05338 [0.02608, 0.08067], p=0.000204 (mean depletion 0.2692)
+PASS	task5.arm-effect-on-status-attenuates-with-K	F/F_MSY arm x K = +0.5531 [-0.3322, 1.438], p=0.217 (positive = the negative arm effect on F shrinks as K rises)
+FAIL	task5.arm-effect-shrinks-when-conditioning-on-Xhat[f_recent_fmsy]	F/F_MSY: arm coefficient -0.1664 -> +0.293 (+76.0% in magnitude)
+FAIL	task5.arm-effect-shrinks-when-conditioning-on-Xhat[sb_recent_sb0]	depletion: arm coefficient +0.05338 -> -0.1289 (+141.5% in magnitude)
+PASS	task6.psi-higher-under-external-anchor-than-as-published	release-weighted psi-hat: as published (exclude rates) 0.4091 -> external anchor (seeding priors) 0.4137 (+1.1%)
+FAIL	task6.include-arm-rates-sit-between-the-other-two	include-arm rates give 0.4071, between 0.4091 (exclude) and 0.4137 (external)
+PASS	task6.external-anchor-raises-psi-in-every-member	within-member difference (external - as published): median +0.0047, min +0.0017, max +0.0124, positive in 80/80 members
+PASS	task6.mixing-configuration-dominates-the-raising-scheme	psi-hat moves 0.5635 across the K axis (from 0.7860 at K=0.05 to 0.2225 at K=0.35) versus 0.0047 between raising schemes -- a factor of 120
+FAIL	task6.published-baseline-reconciles	closest configuration is K=0.3: psi-hat 0.2259 vs published 0.231 (close), but 35 groups at psi>=0.3 vs published 27 (does not reconcile)
+PASS	task2.report-likelihood-discrepancy-still-holds	exclude arm: the objective's in-window predicted returns sit 21.6% below the values written to plot.rep (median 802 of 3605 fish)
+PASS	task2.discrepancy-is-exclude-only	include arm shortfall is identically zero by construction (both paths apply X-hat to a tagcatch of ~R/X-hat)
+PASS	task2.discrepancy-concentrates-in-the-high-volume-groups	largest shortfall is group 17 (PTTP/pooled / PS.WEST.3): 284 fish on 1210 in-window recaptures
+PASS	task1.penalty-is-identical-under-both-arms	max |rr_penalty(exclude) - rr_penalty(include)| = 0 across the grid
+FAIL	task1.include-mixing-block-invariant-to-X	worst relative range of the include mixing block over the full grid = 0.2254 (tolerance 0.02); median 0.0701
+PASS	task1.include-mixing-block-invariant-to-X-above-0.8	worst relative range of the include mixing block for X >= 0.8 = 0.0086; median 0.0009 -- this is the sub-range where the raised removal is small enough that the survival floor should not rescale the Newton-Raphson target
+PASS	task1.exclude-mixing-block-monotone-toward-one	first differences of the exclude mixing block are negative in 100.0% of grid steps (worst profile 100.0%)
+FAIL	task1.exclude-mixing-block-falls-faster-than-include	relative range exclude > include in 5/6 profiles (median 0.1250 vs 0.0701)
+FAIL	task1.exclude-tag-block-minimum-is-higher	objective argmin shift (exclude - include) is positive in 3/6 profiles; median shift +0.0556 in X
+PASS	task1.argmin-shift-positive-in-every-member[g7]	group 7: shifts ['+0.1667', '+0.1111', '+0.1667'] (median +0.1667)
+FAIL	task1.argmin-shift-positive-in-every-member[g17]	group 17: shifts ['-0.0556', '+0.0000', '+0.0000'] (median +0.0000)
+PASS	task1.argmin-shift-larger-for-the-lower-weight-group	median argmin shift: group 7 (w=354.5) +0.1667 vs group 17 (w=739.2) +0.0000 -- the same ordering as the observed ensemble arm differences (+0.142 vs +0.014)
+PASS	task1.profile-shift-scales-with-mixing-window	median argmin shift +0.0833 at K=0.05 vs +0.0556 at K=0.3; Spearman(K, shift) = -0.121

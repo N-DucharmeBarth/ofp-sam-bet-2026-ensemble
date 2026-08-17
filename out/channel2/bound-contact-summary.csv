@@ -1,0 +1,5 @@
+scale,arm,n_members,n_members_with_contact,frac_members,n_group_cells
+proportion (<=1e-3),include,34,2,0.05882,2
+proportion (<=1e-3),exclude,46,0,0,0
+estimation (<=1% of half-range),include,34,2,0.05882,2
+estimation (<=1% of half-range),exclude,46,0,0,0

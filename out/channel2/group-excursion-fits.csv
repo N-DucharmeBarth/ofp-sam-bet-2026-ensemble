@@ -1,0 +1,25 @@
+scope,predictor,model,n,estimate,se,ci_lo,ci_hi,p_value,r_squared,term,main_effect
+exclude arm,N_mix,signed_dev ~ pred + member FE,230,0.000173935,7.12011e-06,0.000159887,0.000187983,1.687e-59,0.7753,,
+exclude arm,log_N_mix,signed_dev ~ pred + member FE,230,0.0572949,0.00235905,0.0526405,0.0619493,3.807e-59,0.7733,,
+exclude arm,N_mix_over_w,signed_dev ~ pred + member FE,230,0.0473036,0.00230061,0.0427644,0.0518427,1.908e-49,0.7108,,
+exclude arm,psi_hat,signed_dev ~ pred + member FE,230,-0.274392,0.0352618,-0.343964,-0.20482,5.088e-13,0.2806,,
+exclude arm,log_N_mix_over_w,signed_dev ~ pred + member FE,230,0.351759,0.0106133,0.330819,0.372699,2.896e-79,0.8633,,
+include arm,N_mix,signed_dev ~ pred + member FE,170,0.000151658,7.03383e-06,0.000137747,0.000165569,1.473e-45,0.7913,,
+include arm,log_N_mix,signed_dev ~ pred + member FE,170,0.0465603,0.003476,0.0396858,0.0534347,1.483e-26,0.6018,,
+include arm,N_mix_over_w,signed_dev ~ pred + member FE,170,0.0378232,0.00279189,0.0323017,0.0433447,6.135e-27,0.6069,,
+include arm,psi_hat,signed_dev ~ pred + member FE,170,-0.406959,0.0324005,-0.471038,-0.342881,1.886e-24,0.5723,,
+include arm,log_N_mix_over_w,signed_dev ~ pred + member FE,170,0.273231,0.0198607,0.233953,0.312509,1.83e-27,0.6139,,
+both arms,N_mix,signed_dev ~ pred + member FE,400,0.000163427,5.06244e-06,0.000153467,0.000173387,1.6e-102,0.7857,,
+both arms,log_N_mix,signed_dev ~ pred + member FE,400,0.0526632,0.00202729,0.0486746,0.0566517,1.042e-80,0.7065,,
+both arms,N_mix_over_w,signed_dev ~ pred + member FE,400,0.0429048,0.0017967,0.0393699,0.0464397,5.385e-73,0.672,,
+both arms,psi_hat,signed_dev ~ pred + member FE,400,-0.327124,0.0248894,-0.376092,-0.278156,7.887e-32,0.4068,,
+both arms,log_N_mix_over_w,signed_dev ~ pred + member FE,400,0.317938,0.01065,0.296985,0.338891,2.257e-94,0.759,,
+priored groups,N_mix,signed_dev ~ pred * arm + member FE,400,2.22772e-05,1.008e-05,2.44535e-06,4.2109e-05,0.02781,0.789,N_mix:is_exclude,0.000151658
+priored groups,log_N_mix,signed_dev ~ pred * arm + member FE,400,0.0107346,0.0040552,0.00275619,0.018713,0.008522,0.7128,log_N_mix:is_exclude,0.0465603
+priored groups,N_mix_over_w,signed_dev ~ pred * arm + member FE,400,0.00948041,0.00356904,0.0024585,0.0165023,0.008299,0.6791,N_mix_over_w:is_exclude,0.0378232
+priored groups,psi_hat,signed_dev ~ pred * arm + member FE,400,0.132568,0.0503873,0.033433,0.231702,0.008929,0.4195,psi_hat:is_exclude,-0.406959
+priored groups,log_N_mix_over_w,signed_dev ~ pred * arm + member FE,400,0.0785282,0.0210865,0.0370414,0.120015,0.0002318,0.7691,log_N_mix_over_w:is_exclude,0.273231
+priored groups,"N_mix + N_post, both x arm",signed_dev ~ (N_mix + N_post) * is_exclude + C(member_id),400,9.86826e-05,7.77084e-06,8.33934e-05,0.000113972,3.9e-30,0.864,N_mix,
+priored groups,"N_mix + N_post, both x arm",signed_dev ~ (N_mix + N_post) * is_exclude + C(member_id),400,6.17741e-05,5.89683e-06,5.01721e-05,7.33761e-05,3.073e-22,0.864,N_post,
+priored groups,"N_mix + N_post, both x arm",signed_dev ~ (N_mix + N_post) * is_exclude + C(member_id),400,3.38081e-05,1.08658e-05,1.24296e-05,5.51866e-05,0.002032,0.864,N_mix:is_exclude,
+priored groups,"N_mix + N_post, both x arm",signed_dev ~ (N_mix + N_post) * is_exclude + C(member_id),400,-2.16379e-05,7.72766e-06,-3.68421e-05,-6.43374e-06,0.005424,0.864,N_post:is_exclude,
