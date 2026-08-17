@@ -497,6 +497,14 @@ that either held or did not, and failures are reported in the same form as passe
   adjusting for it <em>increases</em> the axis effect from 33.98 to {{PEN_EFFECT}} while R² rises from
   0.45 to 0.85.</p>
 
+  <figure>
+    <img src="{{FIG_M0_CONFOUND}}" alt="Left: scatter of reporting-rate penalty against M0, coloured by arm, with a separate fitted line per arm; both slopes are positive and the lines cross rather than running parallel offset. Right: violin plot of M0 by arm, showing substantially overlapping distributions.">
+    <figcaption>All 88 retained models, before the convergence screen. M0 predicts the penalty within
+    each arm (left) — that is where the R² jump comes from — but the two M0 distributions overlap
+    (right), so M0 is not the thing separating <span class="arm-i">include</span> from
+    <span class="arm-e">exclude</span>.</figcaption>
+  </figure>
+
   {{CHECK:task4.M0-balanced-across-arms}}
   {{CHECK:task4.adjusted-arm-effect-positive}}
 

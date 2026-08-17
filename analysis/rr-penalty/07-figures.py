@@ -262,6 +262,47 @@ def fig_objective_violin(obj, design):
     return p
 
 
+def fig_m0_confound(df):
+    """Companion to the objective violin, for the M0-confound check: does the
+    penalty-M0 relationship explain the arm gap, and is M0 balanced across
+    arms? Uses all 88 retained models -- the subset the balance check itself
+    is run on, before the convergence screen.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 4.2), width_ratios=[1.3, 1])
+
+    ax = axes[0]
+    for arm in ("include", "exclude"):
+        s = df[df.arm == arm]
+        ax.scatter(s.M0, s.penalty, s=28, color=ARMC[arm], alpha=0.55, lw=0,
+                   zorder=3, label=arm)
+        b, a = np.polyfit(s.M0, s.penalty, 1)
+        xx = np.linspace(s.M0.min(), s.M0.max(), 20)
+        ax.plot(xx, a + b * xx, color=ARMC[arm], lw=2.2, zorder=4)
+    style(ax)
+    ax.set_xlabel("M0 (quarterly M at age 40)")
+    ax.set_ylabel("reporting-rate penalty")
+    ax.set_title("Penalty against M0, by arm", fontsize=9.5)
+    ax.legend(loc="upper left", ncol=1, fontsize=8.5)
+
+    ax = axes[1]
+    for k, arm in enumerate(("include", "exclude")):
+        v = df[df.arm == arm].M0.values
+        med = _violin(ax, v, k, 0.62, ARMC[arm])
+    ax.set_xticks([0, 1])
+    ax.set_xticklabels(["include", "exclude"], fontsize=9)
+    ax.set_xlim(-0.55, 1.55)
+    style(ax)
+    ax.set_ylabel("M0")
+    ax.set_title("M0 balance across arms", fontsize=9.5)
+    fig.suptitle("M0 tracks the penalty within each arm, but is not what separates the arms",
+                 fontsize=11, fontweight="bold", y=1.06)
+    fig.tight_layout()
+    p = os.path.join(FIG, "m0-confound-check.png")
+    fig.savefig(p, dpi=170, bbox_inches="tight")
+    plt.close(fig)
+    return p
+
+
 def main():
     os.makedirs(FIG, exist_ok=True)
     mix = pd.read_csv(os.path.join(OUT, "mixing-frame.csv"))
@@ -270,7 +311,7 @@ def main():
     obj = pd.read_csv(os.path.join(REPO, "data", "ensemble", "objective-components.csv"))
     obj["member_id"] = obj.ensemble_id.str.extract(r"(\d+)$").astype(int)
     for p in (fig_arm_gap_vs_K(mix), fig_excursion(exc), fig_balance(df),
-             fig_objective_violin(obj, df)):
+             fig_objective_violin(obj, df), fig_m0_confound(df)):
         print("wrote", os.path.relpath(p, os.path.dirname(OUT)))
 
 
