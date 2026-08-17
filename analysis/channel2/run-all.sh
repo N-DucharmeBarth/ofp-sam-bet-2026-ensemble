@@ -28,6 +28,8 @@ else
   echo "skipping profile analysis: no profile-objective.csv (set C2_RUN_MFCL=1)"
 fi
 
+python3 "$here/21-convergence-balance.py"
+
 python3 "$here/18-figures.py"
 
 cat out/channel2/checks-*.tsv > out/channel2/checks.log

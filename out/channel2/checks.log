@@ -49,3 +49,14 @@ PASS	task10.large-unexplained-objective-term-under-include-at-low-X	include: max
 PASS	task10.unexplained-term-concentrates-at-low-X	include: the unexplained term peaks at X = [0.3] -- i.e. where the raised removal R/X is largest, which is where the cap must engage
 FAIL	task10.unexplained-term-vanishes-above-X-0.8	include: unexplained term range above X = 0.8 is 2.7 -- the cap does not engage there, which is why the cancellation is exact in that sub-range
 PASS	task10.binary-carries-the-cap-and-honours-the-flag	resolves the SC22 open question empirically: the 2.2.7.9 binary both honours tag_flags(i,2) (the arms differ) and applies the posfun cap (an unexplained penalty term appears under `include` at low X only)
+PASS	task11.convergence-screen-selects-exactly-the-retained-par-set	MGC <= 0.0001 selects 80 members and the retained-par set is 80; the two sets are identical, so no conclusion changes coverage by switching criterion
+PASS	task11.tagging-module-is-arm-specifically-fragile	cumulative loss from the designed 50 draws: include 16/50 (32%) vs exclude 4/50 (8%) -- a factor of 4.0
+PASS	task11.convergence-failure-alone-is-arm-specific	of models that ran: include 7/41 (17.1%) failed MGC vs exclude 1/47 (2.1%)
+PASS	task11.convergence-screen-worsens-arm-balance	include share falls from 46.6% to 42.5%; |SMD| on K goes 0.044 -> 0.111
+PASS	task11.lost-include-members-would-have-raised-the-include-arm-F	imputed F/F_MSY for the 16 lost include members sits +0.1256 above the converged include mean, so their loss pulled the include arm DOWN and shrank the (negative) arm effect -- the reported gap is a lower bound in magnitude
+PASS	task11.reweighting-to-the-designed-K-marginal-widens-the-gap	F/F_MSY arm effect: converged-only -0.1315 -> IPW to the designed arm x K marginal -0.1418 (+7.8% in magnitude)
+PASS	task11.completing-the-arms-widens-the-gap	F/F_MSY arm effect: converged-only -0.1315 -> completed 50/50 by imputation -0.1346 (+2.4% in magnitude); illustrative, not a correction
+PASS	task11.reported-gap-is-a-lower-bound[f_recent_fmsy]	every balancing route moves the gap away from zero: -0.1315 -> -0.1346
+PASS	task11.reported-gap-is-a-lower-bound[sb_recent_sb0]	every balancing route moves the gap away from zero: 0.0466 -> 0.0481
+PASS	task11.raw-gap-is-materially-truncated-by-the-convergence-screen	raw F/F_MSY gap falls from -0.1415 (all that ran) to -0.0858 (converged only), a 39% shrinkage; completing the arms restores it to -0.1264
+PASS	task11.adjusted-gap-is-robust-where-the-raw-gap-is-not	adjusted estimate moves +2.4% on completion while the raw difference moves +47% -- the adjustment already conditions on the axes that drive the differential loss, so the adjusted effect is the one to quote

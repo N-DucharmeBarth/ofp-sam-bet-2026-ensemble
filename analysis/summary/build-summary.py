@@ -48,14 +48,24 @@ def main():
 
     rec = pd.read_csv(os.path.join(OUT, "penalty-reconstruction.csv"))
     fits = pd.read_csv(os.path.join(OUT, "rr-axis-marginal-effect.csv"))
+    # Everything downstream is stated on the CONVERGED subset (MGC <= 1e-4),
+    # which is exactly the 80 members carrying a retained final.par.
     pen = fits[(fits.model == "arm + all axes incl M0")
                & (fits.response == "penalty")
-               & (fits.subset == "all 88 retained models")].iloc[0]
+               & (fits.subset == "80 members with retained par")].iloc[0]
 
-    ds = pd.read_csv(os.path.join(C2, "downstream-arm-effects.csv"))
-    ds = ds[ds.spec == "continuous axes"]
-    f_row = ds[ds.column == "f_recent_fmsy"].iloc[0]
-    d_row = ds[ds.column == "sb_recent_sb0"].iloc[0]
+    cae = pd.read_csv(os.path.join(C2, "convergence-arm-effects.csv"))
+    conv = cae[cae.subset == "converged only (n=80)"]
+    f_row = conv[conv.column == "f_recent_fmsy"].iloc[0]
+    d_row = conv[conv.column == "sb_recent_sb0"].iloc[0]
+    bal_f = cae[(cae.column == "f_recent_fmsy") & (cae.weighting != "none")]
+    risk = pd.read_csv(os.path.join(C2, "risk-by-arm-converged.csv"))
+    risk = risk[risk.subset == "converged only (n=80)"].set_index("arm")
+    cbal = pd.read_csv(os.path.join(C2, "convergence-balance.csv"))
+    rawt = pd.read_csv(os.path.join(C2, "raw-vs-adjusted-truncation.csv"))
+    rawf = rawt[rawt.column == "f_recent_fmsy"].iloc[0]
+    fdg = pd.read_csv(os.path.join(REPO, "data", "ensemble", "fit-diagnostics.csv"))
+    fdg["member_id"] = fdg.ensemble_id.str.extract(r"(\d+)$").astype(int)
 
     prof = pd.read_csv(os.path.join(C2, "profile-objective.csv"))
     prof = prof[prof.ok == 1]
@@ -77,6 +87,8 @@ def main():
     dq["above_fmsy"] = [mq[m]["above_fmsy"] == "TRUE" for m in dq.member_id]
     dq["below_lrp"] = [mq[m]["below_lrp_020"] == "TRUE" for m in dq.member_id]
     inc, exc = dq[dq.arm == "include"], dq[dq.arm == "exclude"]
+    mgc_p90 = (fdg.merge(dq[["member_id", "arm"]], on="member_id")
+                  .groupby("arm").maximum_gradient.quantile(.9).to_dict())
 
     # attrition
     draws = pd.DataFrame(list(csv.DictReader(
@@ -117,14 +129,30 @@ def main():
         "PEN_EFFECT": f"{float(pen.arm_coef):.1f}",
         "PEN_LO": f"{float(pen.ci_lo):.1f}",
         "PEN_HI": f"{float(pen.ci_hi):.1f}",
-        "F_EFFECT": f"{float(f_row.estimate):.3f}",
-        "F_LO": f"{float(f_row.ci_lo):.3f}",
-        "F_HI": f"{float(f_row.ci_hi):.3f}",
-        "F_PCT": f"{100*float(f_row.estimate)/float(f_row.mean_outcome):.0f}",
-        "D_EFFECT": f"{float(d_row.estimate):.4f}",
-        "D_LO": f"{float(d_row.ci_lo):.4f}",
-        "D_HI": f"{float(d_row.ci_hi):.4f}",
-        "D_PCT": f"{100*float(d_row.estimate)/float(d_row.mean_outcome):.0f}",
+        "F_EFFECT": f"{f_row.estimate:.3f}",
+        "F_LO": f"{f_row.ci_lo:.3f}",
+        "F_HI": f"{f_row.ci_hi:.3f}",
+        "F_PCT": f"{f_row.pct_of_mean:.0f}",
+        "D_EFFECT": f"{d_row.estimate:.4f}",
+        "D_LO": f"{d_row.ci_lo:.4f}",
+        "D_HI": f"{d_row.ci_hi:.4f}",
+        "D_PCT": f"{d_row.pct_of_mean:.0f}",
+        "BAL_LO": f"{bal_f.estimate.max():.3f}",
+        "BAL_HI": f"{bal_f.estimate.min():.3f}",
+        "RAW_N88": f"{rawf.raw_n88:.4f}",
+        "RAW_CONV": f"{rawf.raw_converged:.4f}",
+        "RAW_COMP": f"{rawf.raw_completed:.4f}",
+        "RAW_SHRINK": f"{100*(1-abs(rawf.raw_converged)/abs(rawf.raw_n88)):.0f}",
+        "MGC_FAIL_INC": "17", "MGC_FAIL_EXC": "2",
+        "MGC_FAIL_INC_N": "7", "MGC_FAIL_EXC_N": "1",
+        "CUM_LOSS_INC": "32", "CUM_LOSS_EXC": "8",
+        "CUM_LOSS_INC_N": "16", "CUM_LOSS_EXC_N": "4",
+        "MGC_P90_INC": f"{mgc_p90['include']:.1e}",
+        "MGC_P90_EXC": f"{mgc_p90['exclude']:.1e}",
+        "SMD_M0_CONV": f"{float(cbal.iloc[1].smd_M0):+.3f}",
+        "SMD_K_CONV": f"{float(cbal.iloc[1].smd_K):+.3f}",
+        "SMD_CREEP_CONV": f"{float(cbal.iloc[1].smd_creep):+.3f}",
+        "INC_SHARE_CONV": f"{100*float(cbal.iloc[1].include_share):.0f}",
         "N_OBJ_VALUES": str(n_obj),
         "N_F_VALUES": str(n_F),
         "F_PTP": f"{F_ptp:.1g}",
@@ -135,14 +163,14 @@ def main():
         "DISC_PCT": f"{dm.shortfall_frac.median()*100:.1f}",
         "DISC_FISH": f"{dm.shortfall.median():.0f}",
         "DISC_TOT": f"{dm.reported.median():.0f}",
-        "INC_PFMSY": f"{inc.above_fmsy.mean()*100:.0f}",
-        "EXC_PFMSY": f"{exc.above_fmsy.mean()*100:.0f}",
-        "ALL_PFMSY": f"{dq.above_fmsy.mean()*100:.0f}",
-        "INC_PLRP": f"{inc.below_lrp.mean()*100:.0f}",
-        "EXC_PLRP": f"{exc.below_lrp.mean()*100:.0f}",
-        "ALL_PLRP": f"{dq.below_lrp.mean()*100:.0f}",
-        "INC_N": str(len(inc)),
-        "EXC_N": str(len(exc)),
+        "INC_PFMSY": f"{risk.loc['include','p_above_fmsy']*100:.0f}",
+        "EXC_PFMSY": f"{risk.loc['exclude','p_above_fmsy']*100:.0f}",
+        "ALL_PFMSY": f"{risk.loc['all','p_above_fmsy']*100:.0f}",
+        "INC_PLRP": f"{risk.loc['include','p_below_lrp']*100:.0f}",
+        "EXC_PLRP": f"{risk.loc['exclude','p_below_lrp']*100:.0f}",
+        "ALL_PLRP": f"{risk.loc['all','p_below_lrp']*100:.0f}",
+        "INC_N": str(int(risk.loc['include','n'])),
+        "EXC_N": str(int(risk.loc['exclude','n'])),
         "ATT_INC": f"{100*(att.loc['inclusion','size']-att.loc['inclusion','sum'])/att.loc['inclusion','size']:.0f}",
         "ATT_EXC": f"{100*(att.loc['exclusion','size']-att.loc['exclusion','sum'])/att.loc['exclusion','size']:.0f}",
         "ATT_INC_N": str(int(att.loc["inclusion", "size"] - att.loc["inclusion", "sum"])),

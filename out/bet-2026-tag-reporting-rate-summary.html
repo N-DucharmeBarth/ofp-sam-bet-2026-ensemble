@@ -348,7 +348,7 @@
   the likelihood on <strong>96 of 98</strong> tag release groups. The setting that does correct
   trips a numerical guard on <strong>2</strong>. Both are flawed; they are not equally
   flawed, and they do not bracket anything.</p>
-  <p class="meta">83 of 99 named checks held · 88 retained models · 80 with a final PAR · 168 fixed-parameter MFCL evaluations</p>
+  <p class="meta">94 of 110 named checks held · 100 drawn · 88 ran · <b>80 converged (MGC ≤ 1e-4)</b> · 168 fixed-parameter MFCL evaluations</p>
 </header>
 
 <div class="exec">
@@ -382,25 +382,42 @@ MFCL quietly caps the removal, and nothing in the standard model output says so.
 <h3>Why this matters for advice</h3>
 
 <p>Reporting rates and fishing mortality trade off. If the model believes more recaptures were
-reported, it needs less fishing to explain the tags that came back. So the choice moves the answer:</p>
+reported, it needs less fishing to explain the tags that came back. So the choice moves the answer.
+All figures below are on the <strong>34 + 46 = 80 models that met the assessment's own
+convergence criterion</strong> (maximum gradient ≤ 1e-4), which turns out to be exactly the set
+carrying a retained parameter file:</p>
 
 <div class="stats">
   <div class="stat">
     <p class="stat-label">Chance fishing exceeds the limit</p>
-    <p class="stat-value">21% <span style="color:var(--ink-3)">vs</span> 39%</p>
-    <p class="stat-sub"><span class="arm-e">exclude</span> vs <span class="arm-i">include</span> models<br>(reported ensemble: 30%)</p>
+    <p class="stat-value">20% <span style="color:var(--ink-3)">vs</span> 29%</p>
+    <p class="stat-sub"><span class="arm-e">exclude</span> vs <span class="arm-i">include</span> models<br>(reported ensemble: 24%)</p>
   </div>
   <div class="stat">
     <p class="stat-label">Chance stock is below the limit</p>
-    <p class="stat-value">17% <span style="color:var(--ink-3)">vs</span> 32%</p>
-    <p class="stat-sub"><span class="arm-e">exclude</span> vs <span class="arm-i">include</span><br>(reported ensemble: 24%)</p>
+    <p class="stat-value">15% <span style="color:var(--ink-3)">vs</span> 24%</p>
+    <p class="stat-sub"><span class="arm-e">exclude</span> vs <span class="arm-i">include</span><br>(reported ensemble: 19%)</p>
   </div>
   <div class="stat">
     <p class="stat-label">Fishing mortality</p>
-    <p class="stat-value">-18%</p>
+    <p class="stat-value">-15%</p>
     <p class="stat-sub">F/F<sub>MSY</sub> under <span class="arm-e">exclude</span>,<br>adjusted for every other axis</p>
   </div>
 </div>
+
+<h3>The corrected setting is also the fragile one</h3>
+
+<p>Of the 50 models drawn for each setting, <strong>16 of the 50
+<span class="arm-i">include</span> models were lost</strong> — either failing to build or failing to
+converge — against <strong>4 of 50</strong> for
+<span class="arm-e">exclude</span>. That is 32% against 8%, a factor of
+four. Convergence failure alone runs 17% against 2%.</p>
+
+<p>This is a real cost of the corrected setting and it should be stated plainly: dividing observed
+recaptures by an estimated rate is numerically demanding, and MFCL does not always get there. It is
+also the reason the two arms are not evenly represented — the surviving
+<span class="arm-i">include</span> models are the ones where the correction happened to be
+well-behaved.</p>
 
 <h3>Including both does not bracket the answer</h3>
 
@@ -463,7 +480,7 @@ that either held or did not, and failures are reported in the same form as passe
   <h3>Not natural mortality</h3>
   <p>M0 has a tighter relationship with this penalty than the flag axis does, and the 88 models are a
   selected subset, so M0 leaking in was the obvious worry. It is not: M0 is balanced across arms, and
-  adjusting for it <em>increases</em> the axis effect from 33.98 to 35.5 while R² rises from
+  adjusting for it <em>increases</em> the axis effect from 33.98 to 34.3 while R² rises from
   0.45 to 0.85.</p>
 
   <div class="check pass"><span class="chip">held</span><code>task4.M0-balanced-across-arms</code><p>standardised mean difference (exclude - include) = -0.076</p></div>
@@ -661,9 +678,17 @@ that either held or did not, and failures are reported in the same form as passe
   <p class="eyebrow">Part 5 · <b>consequences</b></p>
   <h2>What it does to the advice</h2>
 
+  <p class="lede">Stated on the 80 models meeting the assessment's convergence criterion
+  (MGC ≤ 1e-4). That screen selects exactly the 80 members carrying a retained parameter file, so no
+  conclusion changes coverage by switching between the two criteria.</p>
+
+  <div class="check pass"><span class="chip">held</span><code>task11.convergence-screen-selects-exactly-the-retained-par-set</code><p>MGC &lt;= 0.0001 selects 80 members and the retained-par set is 80; the two sets are identical, so no conclusion changes coverage by switching criterion</p></div>
+
   <p>Adjusting for every other grid axis, <span class="arm-e">exclude</span> carries
-  <strong>-0.166</strong> [-0.235, -0.098] on F/F<sub>MSY</sub> — -18% of the ensemble
-  mean — and <strong>+0.0534</strong> [0.0261, 0.0807] on depletion, +20%.</p>
+  <strong>-0.132</strong> [-0.198, -0.066] on F/F<sub>MSY</sub> — -15% of the ensemble
+  mean — and <strong>+0.0466</strong> [0.0180, 0.0752] on depletion, +17%. Both are
+  smaller than the same fits on all 88 models that ran (−0.166 and +0.053), because the convergence
+  screen removes <span class="arm-i">include</span> models disproportionately.</p>
 
   <div class="check pass"><span class="chip">held</span><code>task5.arm-effect-on-F-is-negative[f_recent_fmsy]</code><p>F/F_MSY: -0.1664 [-0.2347, -0.09819], p=5.83e-06 (mean 0.9007)</p></div>
   <div class="check pass"><span class="chip">held</span><code>task5.arm-effect-on-depletion-is-positive</code><p>SB/SB_0: +0.05338 [0.02608, 0.08067], p=0.000204 (mean depletion 0.2692)</p></div>
@@ -689,6 +714,66 @@ that either held or did not, and failures are reported in the same form as passe
   reshapes the likelihood surface and the F-related parameters relocate during estimation. That rules
   out a class of explanation, and it removes the cheap instrument: only re-estimation can measure the
   pathway.</p>
+
+  <h3>Fragility of the tagging module, and what it does to the comparison</h3>
+
+  <p>The losses are heavily arm-specific, and they compound across two stages:</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Stage</th><th class="num"><span class="arm-i">include</span></th>
+      <th class="num"><span class="arm-e">exclude</span></th></tr></thead>
+    <tbody>
+      <tr><td class="lead">Drawn</td><td class="num">50</td><td class="num">50</td></tr>
+      <tr><td class="lead">Failed to build / run</td><td class="num">9</td><td class="num">3</td></tr>
+      <tr><td class="lead">Ran but failed MGC ≤ 1e-4</td><td class="num">7 (17%)</td><td class="num">1 (2%)</td></tr>
+      <tr><td class="lead"><strong>Surviving</strong></td><td class="num"><strong>34</strong></td><td class="num"><strong>46</strong></td></tr>
+      <tr><td class="lead">90th-percentile max gradient</td><td class="num">7.7e-04</td><td class="num">9.9e-05</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="check pass"><span class="chip">held</span><code>task11.tagging-module-is-arm-specifically-fragile</code><p>cumulative loss from the designed 50 draws: include 16/50 (32%) vs exclude 4/50 (8%) -- a factor of 4.0</p></div>
+  <div class="check pass"><span class="chip">held</span><code>task11.convergence-failure-alone-is-arm-specific</code><p>of models that ran: include 7/41 (17.1%) failed MGC vs exclude 1/47 (2.1%)</p></div>
+
+  <p>The convergence screen therefore <em>degrades</em> the randomisation the design bought. The
+  <span class="arm-i">include</span> share falls to 42%, and the standardised arm
+  differences on the other axes widen — M0 to -0.211, effort creep to +0.184,
+  K to +0.111.</p>
+
+  <div class="check pass"><span class="chip">held</span><code>task11.convergence-screen-worsens-arm-balance</code><p>include share falls from 46.6% to 42.5%; |SMD| on K goes 0.044 -> 0.111</p></div>
+
+  <h3>Does the imbalance understate the difference?</h3>
+
+  <p>Yes for the raw comparison, and no for the adjusted one — and the distinction matters.</p>
+
+  <p>The <strong>raw</strong> arm difference in F/F<sub>MSY</sub> falls from -0.1415 across all
+  models that ran to <strong>-0.0858</strong> on the converged set — a 39% shrinkage.
+  Imputing the lost members at their own design points and completing both arms to the designed 50/50
+  restores it to -0.1264. The lost <span class="arm-i">include</span> models sit where F is high,
+  so removing them pulled the <span class="arm-i">include</span> mean down and closed the gap.</p>
+
+  <div class="check pass"><span class="chip">held</span><code>task11.raw-gap-is-materially-truncated-by-the-convergence-screen</code><p>raw F/F_MSY gap falls from -0.1415 (all that ran) to -0.0858 (converged only), a 39% shrinkage; completing the arms restores it to -0.1264</p></div>
+
+  <p>The <strong>adjusted</strong> estimate barely moves. Three routes to a balanced representation —
+  reweighting to the designed arm × K marginal, a K-band matched subset with equal arm counts, and
+  completing both arms by imputation — give F/F<sub>MSY</sub> arm effects spanning -0.142 to
+  -0.124, against -0.132 unbalanced.</p>
+
+  <div class="check pass"><span class="chip">held</span><code>task11.adjusted-gap-is-robust-where-the-raw-gap-is-not</code><p>adjusted estimate moves +2.4% on completion while the raw difference moves +47% -- the adjustment already conditions on the axes that drive the differential loss, so the adjusted effect is the one to quote</p></div>
+
+  <p>That is the expected pattern rather than a coincidence: the adjustment already conditions on the
+  axes along which the losses are concentrated, so the composition shift that moves the raw difference
+  is precisely what the adjusted model absorbs. <strong>The practical consequences are that raw
+  arm-versus-arm comparisons on the retained ensemble understate the difference by roughly 40%, and
+  that the adjusted estimate is the one to quote.</strong> A more balanced ensemble would change the
+  headline little; it would change any unadjusted presentation a great deal.</p>
+
+  <p class="lede">The balancing routes rest on an assumption worth stating: that within a design cell
+  the retained members stand in for the lost ones. Differential convergence is exactly what makes that
+  doubtful, so these are illustrative bounds, not corrections. The imputation in particular
+  extrapolates to the design points where estimation failed — where a smooth model of the outcome is
+  least trustworthy.</p>
 </section>
 
 <section>
@@ -725,8 +810,9 @@ that either held or did not, and failures are reported in the same form as passe
         tail in F rather than an obvious loss of precision.</li>
         <li><strong>The cap penalty is discarded outright</strong> for release groups 21, 72 and 112
         (hardcoded), and 21 is one that engages.</li>
-        <li><strong>Numerically fragile</strong> — 18% of draws failed, three times the rate,
-        and that is informative non-response.</li>
+        <li><strong>Numerically fragile</strong> — 32% of the 50 draws lost against
+        8% for <span class="arm-e">exclude</span>, counting build failures and
+        convergence failures together. Informative non-response, not random loss.</li>
       </ul>
     </div>
   </div>
@@ -817,7 +903,7 @@ that either held or did not, and failures are reported in the same form as passe
         <tr><td class="lead">The cap (<span class="arm-i">include</span>'s problem)</td>
             <td class="num">2 of 98</td><td class="num">≤ 1.04 objective units</td></tr>
         <tr><td class="lead">Pseudo-data (<span class="arm-e">exclude</span>'s problem)</td>
-            <td class="num">96 of 98</td><td class="num">shifts F/F<sub>MSY</sub> by -18%</td></tr>
+            <td class="num">96 of 98</td><td class="num">shifts F/F<sub>MSY</sub> by -15%</td></tr>
       </tbody>
     </table>
     </div>
@@ -835,7 +921,7 @@ that either held or did not, and failures are reported in the same form as passe
     external anchor is the tag-seeding priors, not either fit.</p>
 
     <p>An <span class="arm-i">include</span>-only ensemble already exists and needs no new runs: the
-    41 retained members cover every level of every other axis. Acting on this needs a decision,
+    34 retained members cover every level of every other axis. Acting on this needs a decision,
     not compute.</p>
   </div>
 </section>
@@ -917,8 +1003,8 @@ that either held or did not, and failures are reported in the same form as passe
 
   <h3>Established observationally, on a selected non-crossed ensemble</h3>
   <ul>
-    <li>Adjusted axis effects: +35.5 [28.7, 42.4] on the penalty,
-    -0.166 on F/F<sub>MSY</sub>, +0.0534 on depletion.</li>
+    <li>Adjusted axis effects: +34.3 [27.0, 41.7] on the penalty,
+    -0.132 on F/F<sub>MSY</sub>, +0.0466 on depletion.</li>
     <li>The <code>N_mix</code>/<code>N_post</code> double dissociation.</li>
     <li>That <span class="arm-e">exclude</span> sits systematically closer to the reporting-rate bound.</li>
   </ul>
@@ -940,7 +1026,7 @@ that either held or did not, and failures are reported in the same form as passe
     include/exclude decision.</li>
     <li><strong>Take the axis out of the grid.</strong> Present <span class="arm-i">include</span>-only,
     or present the arms separately with the one-sidedness stated. Presenting a
-    21%-versus-39% split in limit-exceedance probability as uncertainty about the
+    20%-versus-29% split in limit-exceedance probability as uncertainty about the
     stock is not defensible.</li>
     <li><strong>Reconcile the ψ̂ baseline</strong> before any corrected figure circulates.</li>
     <li><strong>Then paired refits</strong> — the only instrument that can measure the downstream

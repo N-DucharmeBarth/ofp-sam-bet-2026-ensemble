@@ -1,0 +1,3 @@
+outcome,column,n_lost,converged_include_mean,imputed_lost_mean,shift_vs_converged
+F_recent / F_MSY,f_recent_fmsy,16,0.9094785002332048,1.0350352236754892,0.1255567234422844
+SB_recent / SB_0,sb_recent_sb0,16,0.2588766898537518,0.22501791505516547,-0.033858774798586316
