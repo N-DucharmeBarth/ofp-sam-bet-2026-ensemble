@@ -7,3 +7,10 @@ bet-2026-ensemble-retained-final-pars-*.tar.gz
 
 # reporting-rate penalty analysis: parsed-par cache
 analysis/rr-penalty/.par-cache.pkl
+
+# stray files MFCL writes into its working directory
+XXX
+argv
+argv1
+error.log
+fmin.log
