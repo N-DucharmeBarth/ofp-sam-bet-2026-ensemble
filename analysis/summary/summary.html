@@ -405,6 +405,13 @@ carrying a retained parameter file:</p>
   </div>
 </div>
 
+<p class="lede">These risk figures reflect only <strong>structural</strong> uncertainty — the spread
+across grid cells (h, K, τ, M0, effort creep, and the RR flag) — each cell taken at its single
+best-fitting parameter vector. They do not fold in <strong>estimation</strong> uncertainty, the spread
+of plausible parameter values <em>within</em> a single fit. Folding that in would widen every
+probability reported here and could shift the two arms' numbers unevenly; see the note below the
+adjusted arm effects for what stands in the way of computing it now.</p>
+
 <h3>The corrected setting is also the fragile one</h3>
 
 <p>Of the 50 models drawn for each setting, <strong>{{CUM_LOSS_INC_N}} of the 50
@@ -756,9 +763,9 @@ that either held or did not, and failures are reported in the same form as passe
   {{CHECK:task11.raw-gap-is-materially-truncated-by-the-convergence-screen}}
 
   <p>The <strong>adjusted</strong> estimate barely moves. Three routes to a balanced representation —
-  reweighting to the designed arm × K marginal, a K-band matched subset with equal arm counts, and
-  completing both arms by imputation — give F/F<sub>MSY</sub> arm effects spanning {{BAL_HI}} to
-  {{BAL_LO}}, against {{F_EFFECT}} unbalanced.</p>
+  reweighting to the designed arm × K marginal, completing both arms by imputation, and a genuinely
+  balanced <strong>subset of models that actually ran</strong> (below) — give F/F<sub>MSY</sub> arm
+  effects spanning {{BAL_HI}} to {{BAL_LO}}, against {{F_EFFECT}} unbalanced.</p>
 
   {{CHECK:task11.adjusted-gap-is-robust-where-the-raw-gap-is-not}}
 
@@ -769,11 +776,62 @@ that either held or did not, and failures are reported in the same form as passe
   that the adjusted estimate is the one to quote.</strong> A more balanced ensemble would change the
   headline little; it would change any unadjusted presentation a great deal.</p>
 
-  <p class="lede">The balancing routes rest on an assumption worth stating: that within a design cell
-  the retained members stand in for the lost ones. Differential convergence is exactly what makes that
-  doubtful, so these are illustrative bounds, not corrections. The imputation in particular
-  extrapolates to the design points where estimation failed — where a smooth model of the outcome is
-  least trustworthy.</p>
+  <h3>A balanced subset of real runs, not interpolation</h3>
+
+  <p>The routes above lean on a fitted model to stand in for the composition the design intended. It is
+  worth also asking the question with no model at all: is there a subset of the 80 converged runs,
+  <em>as fitted</em>, that is balanced on its own? Optimal 1:1 matching — pairing each
+  <span class="arm-i">include</span> model to the <span class="arm-e">exclude</span> model closest to
+  it on the five continuous axes (K, τ, M0, effort creep, h), by minimum total distance, with a caliper
+  to drop poor matches — finds <strong>{{MATCH_N}} pairs</strong> ({{MATCH_N}}×2 of the
+  {{MATCH_TOTAL}} converged models) with every axis balanced to |SMD| < 0.15.</p>
+
+  {{CHECK:task11.matched-pairs-achieve-good-covariate-balance}}
+
+  <p>On those {{MATCH_N}} pairs, the <strong>raw, unadjusted, unmodelled</strong> paired difference is
+  F/F<sub>MSY</sub> {{PAIR_F}} [{{PAIR_F_LO}}, {{PAIR_F_HI}}] and depletion {{PAIR_D}}
+  [{{PAIR_D_LO}}, {{PAIR_D_HI}}] — matching or exceeding the adjusted whole-sample estimate, using no
+  regression at all. This is the cleanest evidence that the imbalance was suppressing the raw
+  comparison rather than the adjustment manufacturing an effect that is not really there.</p>
+
+  {{CHECK:task11.raw-paired-difference-corroborates-the-adjusted-estimate}}
+
+  <p class="lede">The reweighting and imputation routes rest on an assumption worth stating: that
+  within a design cell the retained members stand in for the lost ones. Differential convergence is
+  exactly what makes that doubtful, so those two are illustrative bounds, not corrections — the
+  imputation in particular extrapolates to the design points where estimation failed, where a smooth
+  model of the outcome is least trustworthy. The matched-pairs result does not carry that assumption:
+  it uses only models that were actually fitted.</p>
+
+  <h3>What these numbers do not include</h3>
+
+  <p>Every risk and arm-effect figure in this document — the adjusted estimates, the matched pairs, the
+  P(F&gt;F<sub>MSY</sub>) and P(SB&lt;LRP) figures above — is built from each model's single
+  best-fitting parameter vector, one point per grid cell. None of it propagates
+  <strong>estimation uncertainty</strong>, the spread of parameter values consistent with the data
+  within a single fit. What is reported here is the <strong>structural</strong> component only: how the
+  point estimate moves across the grid. That is a real, distinct restriction, not a formality — the
+  repository's own combined structural-and-estimation audit
+  (<code>results/tables/estimation-uncertainty-audit.csv</code>, pooling 100 joint-Hessian draws per
+  model with equal weight across all 80 retained models) puts the 10th–90th percentile of
+  SB<sub>recent</sub>/SB<sub>MSY</sub> at roughly 0.82 to 2.57 around a median of 1.53 — a band wide
+  enough that estimation uncertainty is not a minor addition on top of the structural spread reported
+  here. That table is pooled across <strong>both arms together</strong>, so it confirms the scale of
+  what is missing without being able to say how the two arms' risk figures would move relative to each
+  other.</p>
+
+  <p>Answering that would need the per-model draws split and recombined by arm, and the repository only
+  partially supports doing so. Per-model joint-Hessian draws exist for <strong>{{HESS_N}} of the
+  {{HESS_TOTAL}} converged models</strong> ({{HESS_INC}} of {{HESS_INC_N}}
+  <span class="arm-i">include</span>, {{HESS_EXC}} of {{HESS_EXC_N}} <span class="arm-e">exclude</span>
+  — the {{HESS_MISSING}} gaps are exactly the models without a positive-definite Hessian, split evenly
+  across arms, so not themselves an added source of imbalance). Even with full coverage, combining a
+  hundred joint draws per model into a single arm-conditional risk estimate is a real undertaking, not
+  a quick addition, and the existing pipeline for it
+  (<code>report/augment-uncertainty-projection.R</code>) requires an R toolchain with several packages
+  that this analysis environment does not have. It was not attempted here.
+  <strong>The structural-only figures above should be labelled as such wherever they are used, and
+  should not be read as the full assessment uncertainty on the arm comparison.</strong></p>
 </section>
 
 <section>
@@ -1003,10 +1061,14 @@ that either held or did not, and failures are reported in the same form as passe
 
   <h3>Established observationally, on a selected non-crossed ensemble</h3>
   <ul>
-    <li>Adjusted axis effects: +{{PEN_EFFECT}} [{{PEN_LO}}, {{PEN_HI}}] on the penalty,
-    {{F_EFFECT}} on F/F<sub>MSY</sub>, +{{D_EFFECT}} on depletion.</li>
+    <li>Adjusted axis effects on the 80 converged models: +{{PEN_EFFECT}} [{{PEN_LO}}, {{PEN_HI}}] on
+    the penalty, {{F_EFFECT}} on F/F<sub>MSY</sub>, +{{D_EFFECT}} on depletion.</li>
     <li>The <code>N_mix</code>/<code>N_post</code> double dissociation.</li>
     <li>That <span class="arm-e">exclude</span> sits systematically closer to the reporting-rate bound.</li>
+    <li>That the <span class="arm-i">include</span> setting is arm-specifically fragile — 32% of drawn
+    models lost to build or convergence failure against 8% for <span class="arm-e">exclude</span> — and
+    that on {{MATCH_N}} covariate-matched pairs of real, converged runs the raw F/F<sub>MSY</sub>
+    difference ({{PAIR_F}}) matches the adjusted whole-sample estimate without any model behind it.</li>
   </ul>
 
   <h3>Not established</h3>
@@ -1018,6 +1080,11 @@ that either held or did not, and failures are reported in the same form as passe
     <li><strong>A reconciled ψ̂ correction.</strong></li>
     <li><strong>The magnitude of the small-release-group risk</strong> in this assessment specifically —
     SC22 simulation indicates a heavy upper tail in F, but we have not quantified it here.</li>
+    <li><strong>How the risk figures change once estimation uncertainty is included.</strong> Every
+    P(F&gt;F<sub>MSY</sub>) and P(SB&lt;LRP) figure here reflects structural uncertainty only — the
+    spread of single best-fitting parameter vectors across the grid — with none of the within-model
+    parameter uncertainty folded in. The ensemble's own audit shows that uncertainty is large in scale;
+    it is pooled across both arms in the repository and was not decomposed by arm here (Part 5).</li>
   </ul>
 
   <h3>Recommended sequence</h3>

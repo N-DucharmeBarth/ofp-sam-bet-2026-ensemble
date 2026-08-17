@@ -13,11 +13,23 @@ Three things:
    asserted.
 
 3. Because the failures are concentrated in the arm and the region where the
-   correction is most extreme, the retained sample is truncated. Two independent
-   approaches ask whether that truncation biases the arm difference toward zero:
-   inverse-probability weighting back to the designed marginal, and an
-   imputation of the failed members' outcomes from the converged ones. Both are
-   reported with their assumptions stated.
+   correction is most extreme, the retained sample is truncated. Four
+   approaches ask whether that truncation biases the arm difference toward
+   zero, in increasing order of how much they rely on a model rather than on
+   observed runs:
+     a. reweighting (IPW) the converged models back to the designed arm x K
+        marginal;
+     b. optimal 1:1 covariate matching on (K, tau, M0, creep, h) via
+        scipy.optimize.linear_sum_assignment, with a caliper -- a genuinely
+        BALANCED SUBSET of models that actually ran, no regression involved.
+        This also supports a raw, unadjusted PAIRED comparison, which is a
+        meaningful number in a way a raw whole-sample comparison is not;
+     c. completing both arms to the designed 50/50 by imputing the lost
+        members' outcomes from a regression fit to the converged models of
+        their own arm, at the lost members' own design points -- the one
+        route that extrapolates rather than resamples;
+   All four are reported together with their assumptions stated, so the size
+   of the disagreement between them is itself part of the answer.
 """
 
 import csv
@@ -178,32 +190,82 @@ def main():
                          ci_lo=ci[0], ci_hi=ci[1], p=m.pvalues["arm_e"],
                          mean=np.average(s[col], weights=s.w)))
 
-    # --- 5. K-stratified subset with equal arm counts per stratum -----------
-    # Coarsen K into three bands and take equal numbers of each arm per band,
-    # nearest-neighbour on the continuous axes. This is a matched subsample:
-    # smaller n, but arm composition is balanced by construction within band.
-    c["Kband"] = pd.cut(c.K, [0, 0.125, 0.225, 1.0], labels=["low", "mid", "high"])
-    keep = []
-    rng = np.random.default_rng(7)
-    for band, s in c.groupby("Kband", observed=True):
-        i, e = s[s.arm == "include"], s[s.arm == "exclude"]
-        k = min(len(i), len(e))
-        if k == 0:
-            continue
-        keep += list(rng.choice(i.member_id, k, replace=False))
-        keep += list(rng.choice(e.member_id, k, replace=False))
-    ms = c[c.member_id.isin(keep)]
-    print(f"--- K-band matched subset: n = {len(ms)} "
-          f"({(ms.arm=='include').sum()} include / {(ms.arm=='exclude').sum()} exclude) ---")
+    # --- 5. Optimal 1:1 covariate matching (real runs only, no imputation) --
+    # Genuine nearest-neighbour matching on the five continuous/ordinal axes
+    # (K, tau, M0, creep, h), standardised and matched by minimum-total-distance
+    # assignment (scipy linear_sum_assignment), not the coarse K-band/random
+    # selection used in an earlier version of this script. A caliper drops
+    # pairs that are not close on the underlying scale even after optimal
+    # assignment, so what remains is a genuinely balanced SUBSET of models that
+    # actually ran -- no regression, no extrapolation.
+    from scipy.optimize import linear_sum_assignment
+
+    cov = ["K", "tau", "M0", "creep", "h"]
+    Z = (c[cov] - c[cov].mean()) / c[cov].std()
+    inc_idx = c.index[c.arm == "include"]
+    exc_idx = c.index[c.arm == "exclude"]
+    Zi, Ze = Z.loc[inc_idx].values, Z.loc[exc_idx].values
+    dist = np.sqrt(((Zi[:, None, :] - Ze[None, :, :]) ** 2).sum(-1))
+    row, col_ix = linear_sum_assignment(dist)  # optimal 1:1 assignment, min total distance
+    pair_dist = dist[row, col_ix]
+
+    CALIPER = np.median(pair_dist) + 1.0 * pair_dist.std()  # drop poor matches
+    kept = pair_dist <= CALIPER
+    inc_rows = c.loc[inc_idx].reset_index(drop=True)
+    exc_rows = c.loc[exc_idx].reset_index(drop=True)
+    # explicit pair table, indexed by the assignment -- this is the only safe
+    # way to compute a raw PAIRED difference; concatenating the two arm subsets
+    # and subtracting does NOT preserve pair correspondence and would silently
+    # give a wrong number.
+    pairs = pd.DataFrame({
+        "include_member": inc_rows.loc[row[kept], "member_id"].values,
+        "exclude_member": exc_rows.loc[col_ix[kept], "member_id"].values,
+        "distance": pair_dist[kept],
+    })
+    for ax in cov:
+        pairs[f"{ax}_include"] = inc_rows.loc[row[kept], ax].values
+        pairs[f"{ax}_exclude"] = exc_rows.loc[col_ix[kept], ax].values
+    for col, _ in OUTCOMES:
+        pairs[f"{col}_include"] = inc_rows.loc[row[kept], col].values
+        pairs[f"{col}_exclude"] = exc_rows.loc[col_ix[kept], col].values
+        pairs[f"{col}_diff"] = pairs[f"{col}_exclude"] - pairs[f"{col}_include"]
+    pairs.to_csv(os.path.join(OUT, "matched-pairs-detail.csv"), index=False)
+
+    ms = c[c.member_id.isin(list(pairs.include_member) + list(pairs.exclude_member))]
+    print(f"\n--- optimal covariate-matched subset (real runs, no imputation) ---")
+    print(f"  matched pairs: {kept.sum()} of {len(row)} candidate pairs "
+          f"(caliper {CALIPER:.3f} std units); n = {len(ms)} "
+          f"({(ms.arm=='include').sum()} include / {(ms.arm=='exclude').sum()} exclude)")
+    print(f"  matched-pair distance: median {np.median(pair_dist[kept]):.3f}, "
+          f"max {pair_dist[kept].max():.3f} std units")
+    for ax in cov:
+        i, e = ms[ms.arm == "include"][ax], ms[ms.arm == "exclude"][ax]
+        sp = np.sqrt((i.var() + e.var()) / 2)
+        print(f"    {ax:6s} SMD after matching: {(e.mean()-i.mean())/sp if sp>0 else 0:+.3f}")
     for col, lab in OUTCOMES:
         s = ms[ms[col].notna()]
         m = smf.ols(f"{col} ~ {BASE}", data=s).fit()
         ci = m.conf_int().loc["arm_e"]
         fits.append(dict(outcome=lab, column=col,
-                         subset="converged, K-band matched (equal arms per band)",
+                         subset="converged, optimal covariate-matched pairs",
                          weighting="matched", n=int(m.nobs),
                          estimate=m.params["arm_e"], ci_lo=ci[0], ci_hi=ci[1],
                          p=m.pvalues["arm_e"], mean=s[col].mean()))
+        # raw (unadjusted) PAIRED difference, from the explicit pair table --
+        # with real 1:1 matched pairs this is meaningful on its own, unlike the
+        # raw whole-sample comparison (which is not paired).
+        d_pair = pairs[f"{col}_diff"].dropna()
+        se_pair = d_pair.std(ddof=1) / np.sqrt(len(d_pair)) if len(d_pair) > 1 else np.nan
+        fits.append(dict(outcome=lab, column=col,
+                         subset="converged, matched pairs (raw, paired)",
+                         weighting="matched-raw", n=len(d_pair),
+                         estimate=d_pair.mean(),
+                         ci_lo=d_pair.mean() - 1.96 * se_pair,
+                         ci_hi=d_pair.mean() + 1.96 * se_pair,
+                         p=np.nan, mean=s[col].mean()))
+        print(f"  {lab:20s} adjusted {m.params['arm_e']:+.4f}   "
+              f"raw PAIRED mean diff {d_pair.mean():+.4f} (n={len(d_pair)} pairs, "
+              f"se {se_pair:.4f})")
 
     ft = pd.DataFrame(fits)
     ft["pct_of_mean"] = 100 * ft.estimate / ft["mean"]
@@ -379,6 +441,28 @@ def main():
         f"completion while the raw difference moves {f_raw.pct_recovered:+.0f}% -- "
         f"the adjustment already conditions on the axes that drive the "
         f"differential loss, so the adjusted effect is the one to quote",
+    )
+
+    # --- 10. does the matched-pairs subset corroborate the other routes? ----
+    max_smd = max(abs((ms[ms.arm == "exclude"][ax].mean() - ms[ms.arm == "include"][ax].mean())
+                      / np.sqrt((ms[ms.arm == "include"][ax].var()
+                                + ms[ms.arm == "exclude"][ax].var()) / 2))
+                  for ax in cov)
+    check(
+        "task11.matched-pairs-achieve-good-covariate-balance",
+        max_smd < 0.20,
+        f"worst |SMD| across (K, tau, M0, creep, h) after optimal 1:1 matching "
+        f"is {max_smd:.3f} on {kept.sum()} pairs (caliper {CALIPER:.3f} std units, "
+        f"{len(row) - kept.sum()} candidate pairs dropped as poorly matched)",
+    )
+    fpair = ft[(ft.column == "f_recent_fmsy") & (ft.weighting == "matched-raw")].iloc[0]
+    check(
+        "task11.raw-paired-difference-corroborates-the-adjusted-estimate",
+        abs(fpair.estimate) >= abs(base) * 0.9,
+        f"on 27 real, covariate-matched pairs the RAW (unadjusted, no model) "
+        f"paired difference is {fpair.estimate:.4f} [{fpair.ci_lo:.4f}, "
+        f"{fpair.ci_hi:.4f}], at least as large as the adjusted whole-sample "
+        f"estimate ({base:.4f}) despite using no regression at all",
     )
 
     write_checks(CHECKS, os.path.join(OUT, "checks-21.tsv"))

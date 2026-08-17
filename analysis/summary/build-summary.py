@@ -58,7 +58,15 @@ def main():
     conv = cae[cae.subset == "converged only (n=80)"]
     f_row = conv[conv.column == "f_recent_fmsy"].iloc[0]
     d_row = conv[conv.column == "sb_recent_sb0"].iloc[0]
-    bal_f = cae[(cae.column == "f_recent_fmsy") & (cae.weighting != "none")]
+    # three real balancing routes with a model behind them (IPW, matched
+    # regression, imputed completion); the raw paired difference is reported
+    # separately since it is not model-adjusted and has its own CI convention
+    bal_f = cae[(cae.column == "f_recent_fmsy")
+               & (cae.weighting.isin(["IPW", "matched", "imputed"]))]
+    pair_f = cae[(cae.column == "f_recent_fmsy") & (cae.weighting == "matched-raw")].iloc[0]
+    pair_d = cae[(cae.column == "sb_recent_sb0") & (cae.weighting == "matched-raw")].iloc[0]
+    match_n = int(cae[(cae.column == "f_recent_fmsy")
+                      & (cae.weighting == "matched")].n.iloc[0])
     risk = pd.read_csv(os.path.join(C2, "risk-by-arm-converged.csv"))
     risk = risk[risk.subset == "converged only (n=80)"].set_index("arm")
     cbal = pd.read_csv(os.path.join(C2, "convergence-balance.csv"))
@@ -66,6 +74,11 @@ def main():
     rawf = rawt[rawt.column == "f_recent_fmsy"].iloc[0]
     fdg = pd.read_csv(os.path.join(REPO, "data", "ensemble", "fit-diagnostics.csv"))
     fdg["member_id"] = fdg.ensemble_id.str.extract(r"(\d+)$").astype(int)
+
+    # coverage of the existing per-model Hessian (estimation) uncertainty draws
+    hess_dir = os.path.join(REPO, "data", "estimation", "per-model")
+    hess_ids = {int(re.search(r"(\d+)", f).group(1))
+               for f in os.listdir(hess_dir) if f.endswith(".rds")} if os.path.isdir(hess_dir) else set()
 
     prof = pd.read_csv(os.path.join(C2, "profile-objective.csv"))
     prof = prof[prof.ok == 1]
@@ -89,6 +102,11 @@ def main():
     inc, exc = dq[dq.arm == "include"], dq[dq.arm == "exclude"]
     mgc_p90 = (fdg.merge(dq[["member_id", "arm"]], on="member_id")
                   .groupby("arm").maximum_gradient.quantile(.9).to_dict())
+
+    dqc = dq.merge(fdg[["member_id", "maximum_gradient"]], on="member_id")
+    dqc = dqc[dqc.maximum_gradient <= 1e-4]  # the same 80 as everywhere else
+    dqc["has_hess"] = dqc.member_id.isin(hess_ids)
+    hess_by_arm = dqc.groupby("arm").has_hess.agg(n="size", hess="sum")
 
     # attrition
     draws = pd.DataFrame(list(csv.DictReader(
@@ -139,6 +157,21 @@ def main():
         "D_PCT": f"{d_row.pct_of_mean:.0f}",
         "BAL_LO": f"{bal_f.estimate.max():.3f}",
         "BAL_HI": f"{bal_f.estimate.min():.3f}",
+        "MATCH_N": str(match_n // 2),
+        "MATCH_TOTAL": str(int(dqc.shape[0])),
+        "PAIR_F": f"{pair_f.estimate:.3f}",
+        "PAIR_F_LO": f"{pair_f.ci_lo:.3f}",
+        "PAIR_F_HI": f"{pair_f.ci_hi:.3f}",
+        "PAIR_D": f"{pair_d.estimate:.4f}",
+        "PAIR_D_LO": f"{pair_d.ci_lo:.4f}",
+        "PAIR_D_HI": f"{pair_d.ci_hi:.4f}",
+        "HESS_N": str(int(hess_by_arm["hess"].sum())),
+        "HESS_TOTAL": str(int(hess_by_arm["n"].sum())),
+        "HESS_MISSING": str(int((hess_by_arm["n"] - hess_by_arm["hess"]).sum())),
+        "HESS_INC": str(int(hess_by_arm.loc["include", "hess"])),
+        "HESS_INC_N": str(int(hess_by_arm.loc["include", "n"])),
+        "HESS_EXC": str(int(hess_by_arm.loc["exclude", "hess"])),
+        "HESS_EXC_N": str(int(hess_by_arm.loc["exclude", "n"])),
         "RAW_N88": f"{rawf.raw_n88:.4f}",
         "RAW_CONV": f"{rawf.raw_converged:.4f}",
         "RAW_COMP": f"{rawf.raw_completed:.4f}",
