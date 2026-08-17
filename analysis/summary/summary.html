@@ -1,0 +1,723 @@
+<title>Tag Reporting Rate Findings</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ground:   #f3f6f7;
+    --surface:  #ffffff;
+    --plate:    #fcfcfb;
+    --ink:      #111a20;
+    --ink-2:    #48565f;
+    --ink-3:    #7c8990;
+    --rule:     #dde5e8;
+    --rule-2:   #eaf0f2;
+    --accent:   #1c5aa8;
+    --include:  #2a78d6;
+    --exclude:  #d4551f;
+    --pass:     #1f6f5c;
+    --pass-bg:  #e4f0ec;
+    --hold:     #8f5a0c;
+    --hold-bg:  #f6ecda;
+    --code-bg:  #eef3f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground:   #0e1418;
+      --surface:  #151d22;
+      --plate:    #e9ecec;
+      --ink:      #edf3f5;
+      --ink-2:    #a6b4bb;
+      --ink-3:    #79878e;
+      --rule:     #26333a;
+      --rule-2:   #1d272d;
+      --accent:   #6ba5ea;
+      --include:  #3987e5;
+      --exclude:  #ec7a49;
+      --pass:     #56b39a;
+      --pass-bg:  #14312a;
+      --hold:     #d7a349;
+      --hold-bg:  #33270f;
+      --code-bg:  #1b242a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground:   #0e1418;
+    --surface:  #151d22;
+    --plate:    #e9ecec;
+    --ink:      #edf3f5;
+    --ink-2:    #a6b4bb;
+    --ink-3:    #79878e;
+    --rule:     #26333a;
+    --rule-2:   #1d272d;
+    --accent:   #6ba5ea;
+    --include:  #3987e5;
+    --exclude:  #ec7a49;
+    --pass:     #56b39a;
+    --pass-bg:  #14312a;
+    --hold:     #d7a349;
+    --hold-bg:  #33270f;
+    --code-bg:  #1b242a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: Georgia, "Iowan Old Style", "Source Serif Pro", serif;
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 0 20px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  h1, h2, h3, .eyebrow, .chip, .stat-label, th, .fignote, .tag {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  code, .mono, td.num, .stat-value {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+
+  /* ---------- masthead ---------- */
+  header { padding: 72px 0 34px; }
+  .tag {
+    font-size: 11.5px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--accent); font-weight: 650; margin: 0 0 18px;
+  }
+  h1 {
+    font-size: clamp(30px, 5vw, 43px); line-height: 1.12; letter-spacing: -.021em;
+    font-weight: 680; margin: 0 0 16px; text-wrap: balance;
+  }
+  .standfirst {
+    font-size: 19px; color: var(--ink-2); margin: 0; max-width: 62ch;
+    text-wrap: pretty;
+  }
+  .meta {
+    margin: 26px 0 0; font-size: 13.5px; color: var(--ink-3);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  /* ---------- headline stats ---------- */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+    gap: 1px; background: var(--rule); border: 1px solid var(--rule);
+    border-radius: 3px; overflow: hidden; margin: 34px 0 8px;
+  }
+  .stat { background: var(--surface); padding: 17px 18px 15px; }
+  .stat-label {
+    font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 620; margin: 0 0 7px;
+  }
+  .stat-value {
+    font-size: clamp(21px, 2.1vw, 25px); font-weight: 600; letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums; line-height: 1.1; margin: 0;
+    white-space: nowrap;
+  }
+  .stat-sub { font-size: 12.5px; color: var(--ink-3); margin: 5px 0 0; line-height: 1.4; }
+
+  /* ---------- sections with a task rail ---------- */
+  section { margin: 54px 0 0; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 620; margin: 0 0 9px;
+    padding-bottom: 9px; border-bottom: 1px solid var(--rule);
+  }
+  .eyebrow b { color: var(--accent); font-weight: 700; }
+  h2 {
+    font-size: 25px; line-height: 1.22; letter-spacing: -.018em;
+    font-weight: 660; margin: 0 0 4px; text-wrap: balance;
+  }
+  h3 {
+    font-size: 16px; letter-spacing: -.005em; font-weight: 640;
+    margin: 34px 0 2px; text-wrap: balance;
+  }
+  p { margin: 14px 0; max-width: 68ch; text-wrap: pretty; }
+  ul { margin: 14px 0; padding-left: 20px; max-width: 68ch; }
+  li { margin: 9px 0; }
+  strong { font-weight: 700; }
+  a { color: var(--accent); }
+
+  code {
+    font-size: .855em; background: var(--code-bg); color: var(--ink);
+    padding: 1.5px 5px; border-radius: 3px;
+  }
+  .arm-i { color: var(--include); font-weight: 700; font-style: normal; }
+  .arm-e { color: var(--exclude); font-weight: 700; font-style: normal; }
+
+  /* ---------- the tripwire chips ---------- */
+  .check {
+    display: grid; grid-template-columns: auto 1fr; gap: 5px 11px;
+    align-items: baseline; background: var(--surface);
+    border: 1px solid var(--rule); border-left: 3px solid var(--pass);
+    border-radius: 3px; padding: 12px 15px; margin: 15px 0;
+  }
+  .check.hold { border-left-color: var(--hold); }
+  .check .chip {
+    font-size: 10px; letter-spacing: .085em; text-transform: uppercase;
+    font-weight: 680; padding: 3px 8px; border-radius: 20px; white-space: nowrap;
+    color: var(--pass); background: var(--pass-bg);
+  }
+  .check.hold .chip { color: var(--hold); background: var(--hold-bg); }
+  .check code {
+    background: none; padding: 0; font-size: 12.5px; color: var(--ink-2);
+    word-break: break-word;
+  }
+  .check p {
+    grid-column: 1 / -1; margin: 2px 0 0; font-size: 14px;
+    color: var(--ink-2); line-height: 1.5; max-width: none;
+  }
+
+  /* ---------- code block ---------- */
+  pre {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 3px;
+    padding: 15px 17px; overflow-x: auto; margin: 18px 0;
+    font-size: 12.5px; line-height: 1.62; color: var(--ink-2);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  pre b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- tables ---------- */
+  .scroll { overflow-x: auto; margin: 20px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
+  th {
+    text-align: left; font-size: 10.5px; letter-spacing: .075em;
+    text-transform: uppercase; color: var(--ink-3); font-weight: 640;
+    padding: 0 14px 8px 0; border-bottom: 1px solid var(--rule); white-space: nowrap;
+  }
+  td {
+    padding: 9px 14px 9px 0; border-bottom: 1px solid var(--rule-2);
+    color: var(--ink-2); vertical-align: baseline;
+  }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  td.lead { color: var(--ink); }
+  tbody tr:last-child td { border-bottom: none; }
+  .up { color: var(--exclude); font-weight: 700; }
+
+  /* ---------- figures ---------- */
+  figure { margin: 26px 0; }
+  figure img {
+    display: block; width: 100%; height: auto; border-radius: 3px;
+    border: 1px solid var(--rule); background: var(--plate); padding: 6px;
+  }
+  figcaption {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 13px; color: var(--ink-3); margin-top: 10px;
+    line-height: 1.5; max-width: 68ch;
+  }
+
+  /* ---------- closing panel ---------- */
+  .panel {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 6px 24px 22px; margin: 22px 0;
+  }
+  .panel h3:first-child { margin-top: 20px; }
+
+  footer {
+    margin: 60px 0 0; padding-top: 22px; border-top: 1px solid var(--rule);
+    font-size: 13px; color: var(--ink-3);
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+  @media (max-width: 620px) {
+    body { font-size: 16px; padding: 0 16px 64px; }
+    header { padding: 44px 0 26px; }
+  }
+
+  /* ---------- print / PDF ----------
+     Paper is always light, whatever the viewer's theme. The selector list
+     matches the specificity of the [data-theme] block above and sits after it,
+     so it wins in every theme state. */
+  @media print {
+    :root, :root[data-theme="dark"], :root[data-theme="light"] {
+      color-scheme: light;
+      --ground:   #ffffff;
+      --surface:  #ffffff;
+      --plate:    #ffffff;
+      --ink:      #10171c;
+      --ink-2:    #3d4a53;
+      --ink-3:    #6c7980;
+      --rule:     #c9d4d9;
+      --rule-2:   #e2e9ec;
+      --accent:   #14508f;
+      --include:  #1b5fb5;
+      --exclude:  #b8460f;
+      --pass:     #1a5e4e;
+      --pass-bg:  #eaf3f0;
+      --hold:     #7a4c08;
+      --hold-bg:  #f8f0e0;
+      --code-bg:  #f0f4f6;
+    }
+    @page { size: A4; margin: 16mm 15mm 18mm; }
+
+    body { font-size: 10.2pt; line-height: 1.5; padding: 0; }
+    .wrap { max-width: none; }
+    p, ul, li { max-width: none; orphans: 3; widows: 3; }
+
+    header { padding: 0 0 14px; }
+    h1 { font-size: 23pt; }
+    .standfirst { font-size: 11.5pt; }
+    h2 { font-size: 15pt; }
+    h3 { font-size: 11pt; margin-top: 18px; }
+    section { margin-top: 26px; }
+
+    /* keep every self-contained unit whole on one page */
+    figure, .check, .stat, pre, table, .panel { break-inside: avoid; }
+    h1, h2, h3, .eyebrow { break-after: avoid; }
+    .eyebrow + h2 { break-before: avoid; }
+    thead { display: table-header-group; }
+    tr { break-inside: avoid; }
+
+    .stats { break-inside: avoid; margin: 20px 0 6px; }
+    /* narrower columns on paper wrap some labels to two lines; reserve the
+       second line everywhere so the four values stay on one baseline */
+    .stat-label { min-height: 2.4em; }
+    .stat-value { font-size: 15pt; }
+    figure img { padding: 0; border-color: var(--rule); }
+    .scroll { overflow-x: visible; }
+    table { min-width: 0; font-size: 8.8pt; }
+    pre { font-size: 8.4pt; }
+    .check code { font-size: 8.6pt; }
+    .check p { font-size: 9.4pt; }
+    footer { break-inside: avoid; margin-top: 30px; }
+  }
+</style><style>
+  /* additions for the synthesis document */
+  .exec {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent); border-radius: 3px;
+    padding: 4px 26px 22px; margin: 26px 0 6px;
+  }
+  .exec h2 { font-size: 19px; margin-top: 22px; }
+  .exec p { font-size: 17.5px; }
+  .verdict {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-left: 3px solid var(--exclude-c); border-radius: 3px;
+    padding: 4px 24px 20px; margin: 22px 0;
+  }
+  .verdict h3:first-child { margin-top: 20px; }
+  :root { --exclude-c: #b8460f; --include-c: #1b5fb5; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --exclude-c: #ec7a49; --include-c: #3987e5; }
+  }
+  :root[data-theme="dark"] { --exclude-c: #ec7a49; --include-c: #3987e5; }
+  @media print { :root, :root[data-theme="dark"], :root[data-theme="light"] {
+    --exclude-c: #b8460f; --include-c: #1b5fb5; } }
+  .arm-i { color: var(--include-c); font-weight: 700; font-style: normal; }
+  .arm-e { color: var(--exclude-c); font-weight: 700; font-style: normal; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+         background: var(--rule); border: 1px solid var(--rule);
+         border-radius: 3px; margin: 20px 0; }
+  .two > div { background: var(--surface); padding: 4px 18px 16px; }
+  .two h4 { font-family: system-ui, sans-serif; font-size: 13px;
+            letter-spacing: .03em; margin: 16px 0 0; }
+  .two ul { margin: 10px 0 0; padding-left: 18px; font-size: 14.5px; }
+  .two li { margin: 7px 0; }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } }
+  @media print {
+    /* .exec and .verdict are long prose blocks -- keeping them whole strands a
+       near-empty first page, so let them flow and keep the atoms intact instead */
+    .exec, .verdict { break-inside: auto; padding-left: 18px; padding-right: 18px; }
+    .exec h2, .verdict h3 { break-after: avoid; }
+    .two { grid-template-columns: 1fr 1fr; break-inside: avoid; }
+    .exec .stats { grid-template-columns: repeat(3, 1fr); }
+    .exec .stat { padding: 12px 12px 10px; }
+    .exec .stat-label { font-size: 8.4pt; letter-spacing: .05em; min-height: 3.1em; }
+    .exec .stat-value { font-size: 13pt; }
+    .exec .stat-sub { font-size: 8pt; }
+    .exec p { font-size: 10.4pt; }
+  }
+  .lede { font-size: 15px; color: var(--ink-2); font-style: italic; }
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="tag">BET 2026 ensemble · tag reporting rates · synthesis</p>
+  <h1>The tag reporting-rate setting is not a neutral uncertainty axis</h1>
+  <p class="standfirst">Two investigations into the tagged-fish reporting-rate penalty. The first asked
+  why the <code>RR</code> grid axis moves that penalty. The second asked whether one setting of the
+  axis inflates the estimated reporting rates themselves, and whether that reaches stock status. It
+  does both.</p>
+  <p class="meta">{{N_PASS}} of {{N_CHECKS}} named checks held · 88 retained models · 80 with a final PAR · 168 fixed-parameter MFCL evaluations</p>
+</header>
+
+<div class="exec">
+<h2>Executive summary — in plain language</h2>
+
+<p>Tuna are tagged, released, and some are later recaptured and reported. The stock assessment has to
+assume what fraction of recaptures actually get reported — the <strong>reporting rate</strong>. After a
+tag is released there is a settling-in period, called the <strong>mixing period</strong>, during which
+the tagged fish have not yet spread through the population and the model is not supposed to take the
+recapture data at face value.</p>
+
+<p>MFCL offers two ways to handle recaptures that occur during that settling-in period. The 2026
+ensemble uses both, treating the choice as a legitimate source of uncertainty and splitting the models
+roughly evenly between them. <strong>The two options are not equally valid.</strong></p>
+
+<p>One option — called <span class="arm-e">exclude</span>, the setting that does <em>not</em> correct
+for reporting — quietly inserts terms into the model's fitting criterion whose best possible answer is
+always &ldquo;reporting is 100%&rdquo;. Those terms are not information about the fishery. They are an
+artefact of the setting. They push the estimated reporting rates upward, away from what the independent
+tag-seeding studies say they should be.</p>
+
+<p>This matters because reporting rates and fishing mortality trade off against each other. If the
+model believes more of the recaptures were reported, it needs less fishing to explain the tags that
+came back. Models using <span class="arm-e">exclude</span> therefore estimate lower fishing mortality
+and a healthier stock — and the difference is not small:</p>
+
+<div class="stats">
+  <div class="stat">
+    <p class="stat-label">Chance fishing exceeds the limit</p>
+    <p class="stat-value">{{EXC_PFMSY}}% <span style="color:var(--ink-3)">vs</span> {{INC_PFMSY}}%</p>
+    <p class="stat-sub"><span class="arm-e">exclude</span> models vs <span class="arm-i">include</span> models<br>(reported ensemble: {{ALL_PFMSY}}%)</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Chance stock is below the limit</p>
+    <p class="stat-value">{{EXC_PLRP}}% <span style="color:var(--ink-3)">vs</span> {{INC_PLRP}}%</p>
+    <p class="stat-sub"><span class="arm-e">exclude</span> vs <span class="arm-i">include</span><br>(reported ensemble: {{ALL_PLRP}}%)</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Fishing mortality</p>
+    <p class="stat-value">{{F_PCT}}%</p>
+    <p class="stat-sub">F/F<sub>MSY</sub> under <span class="arm-e">exclude</span>,<br>adjusted for every other axis</p>
+  </div>
+</div>
+
+<p>So the probability statements that go to the Scientific Committee shift by roughly half their own
+value depending on a modelling convention, not on data or biology.</p>
+
+<p><strong>The other option is better, but not clean.</strong> The <span class="arm-i">include</span>
+setting does not create the artefact — we confirmed this both by reading the MFCL source code and by a
+controlled numerical experiment. But it is numerically fragile: it divides the observed recaptures by
+the estimated reporting rate, which can produce impossibly large numbers, and MFCL then applies an
+internal safety floor. That floor engaged in <strong>every single</strong>
+<span class="arm-i">include</span> model, and where it engages the same artefact partially returns.
+<span class="arm-i">Include</span> models also failed to converge three times as often
+({{ATT_INC}}% vs {{ATT_EXC}}%).</p>
+
+<p><strong>A separate defect, worth reporting on its own.</strong> The tag-fit diagnostic plots
+circulated with assessments cannot detect problems in the mixing period. In that period the plotted
+&ldquo;predicted&rdquo; recaptures are forced to equal the observed ones by construction, in both
+settings — so a good-looking fit there is arithmetic, not evidence. Under
+<span class="arm-e">exclude</span> the numbers the model actually fitted differ from the numbers
+plotted by about {{DISC_PCT}}%.</p>
+
+<h2>What we recommend</h2>
+<p><span class="arm-i">Include</span> is the more defensible of the two settings on statistical grounds,
+and the ensemble should not present the choice as a balanced uncertainty axis. But the case is not
+free: <span class="arm-i">include</span> carries a real numerical-robustness cost, and the MFCL manual
+itself recommends the opposite setting for exactly that reason. The honest position is that this is a
+trade-off between a <em>known statistical contamination</em> and a <em>known numerical fragility</em>,
+and it has been treated as neither.</p>
+</div>
+
+<p class="lede">The rest of this document sets out the evidence. Every directional claim names a check
+that either held or did not, and failures are reported in the same form as passes.</p>
+
+<!-- ================================================================= -->
+<section>
+  <p class="eyebrow">Part 1 · <b>the original question</b></p>
+  <h2>Why the reporting-rate penalty moves with the axis</h2>
+
+  <p>The starting observation was that among all the objective-function components, the
+  <strong>tagged-fish reporting-rate penalty</strong> is the one the <code>RR</code> axis really moves —
+  a median near 60 under <span class="arm-i">include</span> against 100 under
+  <span class="arm-e">exclude</span>.</p>
+
+  <p>That penalty is a prior. Three tag-seeding studies give expected reporting rates for the purse-seine
+  fisheries in regions 2, 3-west and 3-east; the penalty charges the model for departing from them. Its
+  form, transcribed from <code>multifan-cl/src/callpen.cpp</code>, is</p>
+
+<pre>penalty = Σ over unique reporting-rate groups:  w<sub>g</sub> · ( X̂<sub>g</sub> − target<sub>g</sub>/100 )²</pre>
+
+  <p>Reconstructing it from the PAR files reproduced the reported component to
+  <strong>{{MAX_RESID}}</strong> across all 80 members — the arithmetic is settled, and everything
+  downstream rests on it.</p>
+
+  {{CHECK:task3.reconstruction-matches-reported}}
+
+  <p>Three structural facts shape everything that follows. Only <strong>five</strong> reporting-rate
+  groups carry an informative prior (not three, as originally assumed); the penalty's <em>level</em> is
+  dominated by group 17, but the <em>gap between arms</em> comes from groups 18 and 7; and the whole
+  effect is localised in the reporting-rate prior rather than smeared across the fit.</p>
+
+  <p>The obvious worry was that natural mortality was doing the work and leaking in through an
+  unbalanced selection of models. It is not: M0 is balanced across the arms, and adjusting for it
+  <em>increases</em> the estimated axis effect.</p>
+
+  {{CHECK:task4.M0-balanced-across-arms}}
+  {{CHECK:task4.adjusted-arm-effect-positive}}
+
+  <figure>
+    <img src="{{FIG_ARMGAP}}" alt="Left: median reporting-rate penalty against the mixing cutoff K for both arms; exclude sits above include until they cross at K = 0.35. Right: the arm gap by K, positive at every level except 0.35.">
+    <figcaption>The gap tracks the mixing window: largest where windows are longest (small K) and gone
+    where they collapse (K = 0.35). That is the first sign the mechanism lives in the mixing period.</figcaption>
+  </figure>
+</section>
+
+<!-- ================================================================= -->
+<section>
+  <p class="eyebrow">Part 2 · <b>the mechanism</b></p>
+  <h2>Channel 2 — how <span class="arm-e">exclude</span> manufactures evidence for perfect reporting</h2>
+
+  <p>The first investigation explained the gap by a <em>removal</em> argument: the reporting rate has an
+  extra lever under <span class="arm-i">include</span>, so a smaller excursion suffices. That account is
+  correct but says nothing about <em>which direction</em> the rates move. A second mechanism does, and
+  it is the one that matters.</p>
+
+  <h3>In one paragraph</h3>
+  <p>Recaptures during the mixing period <em>do</em> get scored by the likelihood under both settings.
+  What differs is what the model compares them against. MFCL solves for a fishing mortality that removes
+  a target number of tags from the released cohort, and the setting changes that target. Writing
+  <code>R</code> for the observed returns and <code>X̂</code> for the estimated reporting rate:</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Setting</th><th>Removal target</th><th>Predicted reported returns</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td class="lead"><span class="arm-i">include</span></td><td><code>R / X̂</code></td>
+          <td><code>X̂ · (R/X̂) = R</code></td><td>X̂ cancels — the terms say nothing about the reporting rate</td></tr>
+      <tr><td class="lead"><span class="arm-e">exclude</span></td><td><code>R</code></td>
+          <td><code>X̂ · R</code></td><td><strong>minimised at X̂ = 1</strong> — the terms assert perfect reporting</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Under <span class="arm-e">exclude</span> those terms are not evidence about the tagged population.
+  They are pseudo-data. Every mixing-period recapture becomes a small vote for &ldquo;reporting is
+  complete&rdquo;, and the tag-seeding prior is the only thing pushing back.</p>
+
+  <h3>Confirmed two ways</h3>
+  <p>First by transcription from the production source (<code>src/tag3.cpp:2810</code>,
+  <code>src/tagfit.cpp:182</code>) — not inferred. Second by a controlled experiment: take a converged
+  model, freeze every parameter, and sweep one group's reporting rate under each setting. Nothing can
+  re-estimate, so nothing can compensate.</p>
+
+  {{CHECK:task1.exclude-mixing-block-monotone-toward-one}}
+  {{CHECK:task1.include-mixing-block-invariant-to-X-above-0.8}}
+
+  <figure>
+    <img src="{{FIG_PROFILE}}" alt="Six panels. Top row: mixing-window tag likelihood against the reporting rate for three members; the include curve flattens while the exclude curve keeps declining. Bottom row: total objective, with the exclude minimum sitting to the right of the include minimum in all three.">
+    <figcaption>The signature, at frozen parameters. Top: under <span class="arm-i">include</span> the
+    mixing-window likelihood is flat in the reporting rate ({{FLAT_HI}}% median variation above X̂ = 0.8);
+    under <span class="arm-e">exclude</span> it slopes toward X̂ = 1 in 100% of grid steps. Bottom: the
+    best-fitting reporting rate sits <strong>higher</strong> under <span class="arm-e">exclude</span> in
+    every member ({{G7_SHIFT_LO}} to {{G7_SHIFT_HI}} in X̂ for group 7).</figcaption>
+  </figure>
+
+  <h3>Where the mechanism is refined rather than confirmed</h3>
+  <p>The pre-registered stop condition was that the <span class="arm-i">include</span> curve must be
+  flat. Over the whole sweep it is not — up to {{FLAT_WORST}}% variation. The reason is in the source:
+  when the raised removal <code>R/X̂</code> is too large to be feasible, MFCL applies a
+  <code>posfun</code> survival floor that rescales the target, and that rescaling reintroduces an
+  X̂ dependence <em>of the same form as</em> <span class="arm-e">exclude</span>. The floor engages at low
+  X̂, which is exactly where the curve bends.</p>
+
+  {{CHECK:task1.include-mixing-block-invariant-to-X}}
+
+  <p>So the correct statement is not &ldquo;<span class="arm-i">include</span> is clean&rdquo;. It is:
+  <strong>the artefact is pervasive under <span class="arm-e">exclude</span> and localised under
+  <span class="arm-i">include</span></strong> — confined to the release groups where the floor engages,
+  a median of {{FLOOR_MED}} of 98 per model.</p>
+
+  <h3>What orders the pull</h3>
+  <p>The pull scales with the <em>count</em> of mixing-period recaptures attributed to a group, resisted
+  by that group's prior weight — not with the in-window <em>share</em>, which is why an earlier ψ̂-based
+  test found nothing. The decisive evidence is a double dissociation against post-mixing returns, which
+  carry the same identification benefit but none of the pseudo-data pull.</p>
+
+  <figure>
+    <img src="{{FIG_DISSOC}}" alt="Left: scatter of reporting-rate deviation against in-window recaptures, coloured by arm. Right: fitted slopes for in-window and post-mixing recaptures under each arm, with confidence intervals; the two move in opposite directions.">
+    <figcaption>Under <span class="arm-e">exclude</span> the mixing-window returns pull <em>harder</em>
+    (+34%) while post-mixing returns pull <em>less</em> (−35%), both intervals excluding zero. That
+    opposite movement is what re-weighting toward pseudo-data looks like, and it is what separates the
+    mechanism from a generic &ldquo;more data means more movement&rdquo; effect.</figcaption>
+  </figure>
+
+  {{CHECK:task3.Nmix-and-Npost-arm-effects-have-opposite-signs}}
+</section>
+
+<!-- ================================================================= -->
+<section>
+  <p class="eyebrow">Part 3 · <b>consequences</b></p>
+  <h2>What it does to the advice</h2>
+
+  <p>Adjusting for every other grid axis, the <span class="arm-e">exclude</span> setting carries
+  <strong>{{F_EFFECT}}</strong> [{{F_LO}}, {{F_HI}}] on F/F<sub>MSY</sub> — about {{F_PCT}}% of the
+  ensemble mean — and <strong>+{{D_EFFECT}}</strong> [{{D_LO}}, {{D_HI}}] on depletion, about
+  +{{D_PCT}}%.</p>
+
+  {{CHECK:task5.arm-effect-on-F-is-negative[f_recent_fmsy]}}
+  {{CHECK:task5.arm-effect-on-depletion-is-positive}}
+
+  <figure>
+    <img src="{{FIG_DOWNSTREAM}}" alt="Interval plot of the adjusted arm effect on five management quantities, expressed as a percentage of each quantity's mean. Fishing mortality measures are negative; all biomass measures are positive.">
+    <figcaption>Every management quantity moves the way the mechanism predicts, and no interval crosses
+    zero. This is the size of the effect, not evidence for which channel caused it — both channels push
+    F the same way.</figcaption>
+  </figure>
+
+  <h3>An important negative result</h3>
+  <p>We tried to decompose that effect cheaply, by measuring how much F moves per unit reporting rate
+  with every parameter frozen. It moves <strong>not at all</strong>. Across 168 evaluations spanning
+  both settings and the full range of reporting rates, the objective took {{N_OBJ_VALUES}} distinct
+  values per model while F/F<sub>MSY</sub> took <strong>{{N_F_VALUES}}</strong> — a range of exactly
+  {{F_PTP}}.</p>
+
+  {{CHECK:task9.fixed-parameter-profile-can-decompose-the-downstream-effect}}
+
+  <p>The reason is structural: the reporting rate enters only the tag likelihood, its own penalty, and
+  the tagged-cohort solver. The tagged cohort is fitted <em>to</em> the population and never feeds back
+  into population numbers or fishing mortality. So the downstream effect is not arithmetic — it is
+  <strong>optimiser behaviour</strong>. The reporting rate reshapes the likelihood surface and the
+  F-related parameters relocate during estimation.</p>
+
+  <p>That rules out a whole class of explanation, and it also removes the cheap instrument: only
+  re-estimation can measure the pathway. This is why the recommendation on paired refits was reversed
+  once the result came in.</p>
+</section>
+
+<!-- ================================================================= -->
+<section>
+  <p class="eyebrow">Part 4 · <b>the choice</b></p>
+  <h2>Both options have real problems</h2>
+
+  <div class="two">
+    <div>
+      <h4 style="color:var(--exclude-c)">EXCLUDE — no reporting-rate correction</h4>
+      <ul>
+        <li><strong>Pseudo-data on every release group with a mixing window.</strong> The in-window terms
+        are minimised at X̂ = 1 regardless of the data.</li>
+        <li><strong>Estimated rates pushed up.</strong> Systematically closer to the 0.99 upper bound
+        than <span class="arm-i">include</span> across all priored groups.</li>
+        <li><strong>Diagnostics disagree with the fit.</strong> The objective scored in-window
+        predictions ~{{DISC_PCT}}% below what was plotted — {{DISC_FISH}} of {{DISC_TOT}} fish per model.</li>
+        <li><strong>Numerically well-behaved.</strong> Only {{ATT_EXC}}% of draws failed
+        ({{ATT_EXC_N}} of 50), and no survival-floor engagement.</li>
+        <li><strong>It is what the MFCL manual recommends</strong>, on numerical-stability grounds.</li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="color:var(--include-c)">INCLUDE — correct returns by X̂</h4>
+      <ul>
+        <li><strong>No pseudo-data in the general case.</strong> The reporting rate cancels out of the
+        in-window terms; estimates come from post-mixing returns and the prior.</li>
+        <li><strong>But the safety floor reintroduces it locally.</strong> Engaged in
+        <strong>{{FLOOR_PCT}}%</strong> of models, median {{FLOOR_MED}} of 98 release groups — and where
+        it engages, the same X̂·R form returns.</li>
+        <li><strong>The floor penalty is discarded outright</strong> for release groups 21, 72 and 112
+        (hardcoded in MFCL), and group 21 is one of those that engages.</li>
+        <li><strong>Numerically fragile.</strong> {{ATT_INC}}% of draws failed ({{ATT_INC_N}} of 50),
+        three times the <span class="arm-e">exclude</span> rate — and that is informative non-response.</li>
+        <li><strong>Goes against the manual's recommendation.</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>The assessment</h3>
+    <p>On the specific question of whether the setting corrupts the estimated reporting rates,
+    <strong>the two are not symmetric and <span class="arm-i">include</span> is the more appropriate
+    choice</strong>. Under <span class="arm-e">exclude</span> the contamination is structural and
+    universal; under <span class="arm-i">include</span> it is a localised consequence of a numerical
+    guard. That asymmetry is established by source transcription and by a fixed-parameter experiment,
+    not by inference from the ensemble.</p>
+
+    <p>Two honest qualifications. First, <span class="arm-i">include</span>'s higher failure rate is
+    <em>informative</em> non-response — the models that failed are those where the correction was least
+    feasible, so the surviving <span class="arm-i">include</span> set is conditioned on the correction
+    being benign. Second, the manual's preference for <span class="arm-e">exclude</span> is not wrong on
+    its own terms; it is a numerical recommendation, and what this work adds is that following it has a
+    statistical cost that had not been quantified.</p>
+
+    <p><strong>What should change now:</strong> the ensemble should stop presenting this axis as a
+    balanced uncertainty dimension. Whether that means reweighting, reporting both arms separately, or
+    moving to <span class="arm-i">include</span>-only is a scientific judgement — but presenting a
+    {{EXC_PFMSY}}%-versus-{{INC_PFMSY}}% split in limit-exceedance probability as though it were
+    uncertainty about the stock is not defensible.</p>
+  </div>
+
+  <p>One practical point: an <span class="arm-i">include</span>-only ensemble already exists. The
+  {{INC_N}} retained <span class="arm-i">include</span> members cover every level of every other axis —
+  all seven mixing cutoffs, all three overdispersion levels, all five effort-creep levels, and
+  essentially the full steepness and natural-mortality ranges. Acting on the subsetting decision needs
+  no new model runs; it needs a decision.</p>
+</section>
+
+<!-- ================================================================= -->
+<section>
+  <p class="eyebrow">Part 5 · <b>status</b></p>
+  <h2>What is established, and what is not</h2>
+
+  <h3>Established by transcription or controlled experiment</h3>
+  <ul>
+    <li>The penalty's exact functional form, reproduced to {{MAX_RESID}}.</li>
+    <li>That <span class="arm-e">exclude</span>'s mixing-period terms are minimised at X̂ = 1, and
+    <span class="arm-i">include</span>'s are inert in X̂ except where the survival floor engages.</li>
+    <li>That flipping the flag alone, with every parameter frozen, moves the best-fitting reporting rate
+    upward.</li>
+    <li>That the reporting rate cannot move F at frozen parameters — the downstream effect is optimiser
+    behaviour.</li>
+    <li>That the in-window tag-fit diagnostic is an identity in both arms, and that under
+    <span class="arm-e">exclude</span> it differs from what the objective used.</li>
+  </ul>
+
+  <h3>Established observationally, on a selected non-crossed ensemble</h3>
+  <ul>
+    <li>The adjusted axis effects on the penalty (+{{PEN_EFFECT}} [{{PEN_LO}}, {{PEN_HI}}]), on
+    F/F<sub>MSY</sub>, and on depletion.</li>
+    <li>The <code>N_mix</code>/<code>N_post</code> double dissociation.</li>
+    <li>That <span class="arm-e">exclude</span> sits systematically closer to the reporting-rate bound.</li>
+  </ul>
+
+  <h3>Not established</h3>
+  <ul>
+    <li><strong>That the downstream effect is caused by the reporting rate.</strong> Both channels push F
+    the same way and compound; the ensemble is observational; and conditioning on X̂ over-mediates
+    because X̂ and F are jointly estimated. Only paired refits can settle this.</li>
+    <li><strong>That either arm's rates are correct.</strong> The external anchor is the tag-seeding
+    priors, not either fit.</li>
+    <li><strong>A reconciled ψ̂ correction.</strong> The raising scheme moves release-weighted ψ̂ from
+    {{PSI_EXC}} to {{PSI_EXT}} (+{{PSI_PCT}}%), consistently across all 80 models — but the mixing
+    configuration moves it {{PSI_KSPAN}}, a factor of {{PSI_FACTOR}} larger, and the published baseline
+    does not reconcile on group counts.</li>
+  </ul>
+
+  {{CHECK:task6.published-baseline-reconciles}}
+
+  <h3>Recommended sequence</h3>
+  <ol>
+    <li><strong>Report the diagnostic defect upstream.</strong> The in-window tag-fit panels cannot
+    detect misfit, and under <span class="arm-e">exclude</span> they disagree with the objective. This is
+    an MFCL issue, not a configuration choice, and it needs no compute.</li>
+    <li><strong>Reconcile the ψ̂ baseline</strong> before any corrected figure circulates.</li>
+    <li><strong>Put the arm-split status table in front of whoever owns the advice.</strong> A
+    {{EXC_PFMSY}}%-versus-{{INC_PFMSY}}% split in limit-exceedance probability is a decision, not a
+    footnote.</li>
+    <li><strong>Then paired refits</strong> — now the only instrument that can measure the downstream
+    pathway. Time one full-path run before committing to a count, and consider targeting the
+    {{ATT_INC_N}} failed <span class="arm-i">include</span> members, since recovering them would remove
+    the selection concern that otherwise limits an <span class="arm-i">include</span>-only ensemble.</li>
+  </ol>
+</section>
+
+<footer>
+  <p>Analysis code: <code>analysis/rr-penalty/</code> and <code>analysis/channel2/</code>, reproduced by
+  the <code>run-all.sh</code> in each. Tidy CSVs, figures and the full check ledgers in
+  <code>out/</code> and <code>out/channel2/</code>. Source excerpts pinned to
+  <code>multifan-cl</code> commit <code>624dee4f</code>; binary version 2.2.7.9. Objective components and
+  the design table cover all 88 retained models; 80 have a retained <code>final.par</code>, and every
+  quantity states its own coverage. No estimation run was launched for either investigation — every
+  MFCL invocation set <code>parest_flags(1) = 0</code>.</p>
+</footer>
+
+</div>
