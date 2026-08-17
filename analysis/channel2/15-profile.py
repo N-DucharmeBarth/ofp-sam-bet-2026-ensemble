@@ -135,6 +135,68 @@ def scalar_after(path, header):
     return np.nan
 
 
+def derived_quantities(path):
+    """F and biomass quantities from the evaluation's own plot.rep.
+
+    The MSY/yield analysis runs under evaluation-only, so these are the same
+    derived quantities the ensemble reports -- computed here at a reporting
+    rate we set, with every estimated parameter frozen.
+
+    Caveat on coverage: the evaluation run breaks before writing the
+    "in absence of fishing" sections, so SB/SB_F=0 is NOT available here. It
+    does not need to be: SB_F=0 is a function of recruitment, M and maturity,
+    all of which are frozen along a profile, so it is constant and the
+    RELATIVE change in SB_recent equals the relative change in depletion.
+    F/F_MSY and SB/SB_MSY are available directly.
+    """
+    out = {}
+    if not os.path.exists(path):
+        return out
+    # These are quarterly time series, not scalars -- take the recent-year mean
+    # to match the ensemble's own "recent" construction.
+    # "flat" = one long time series wrapped across lines;
+    # "matrix" = region across, year down, so rows are summed over regions.
+    for key, hdr, mode in [
+        ("agg_F", "# Aggregate F", "flat"),
+        ("agg_F_Fmsy", "# Aggregate F over F at MSY", "flat"),
+        ("SB_SBmsy", "# Adult biomass over adult biomass at MSY", "flat"),
+        ("SB_recent", "# Adult biomass", "matrix"),
+    ]:
+        s = _last_series(path, hdr, mode)
+        if s is not None and len(s):
+            n = min(len(s), 4)
+            out[key] = float(np.mean(s[-n:]))
+            out[key + "_final"] = float(s[-1])
+    # genuine scalars
+    for key, hdr in [("MSY", "# MSY"), ("F_at_MSY", "# F at MSY"),
+                     ("SB_msy", "# Adult biomass at MSY")]:
+        out[key] = scalar_after(path, hdr)
+    return out
+
+
+def _last_series(path, header, mode="flat"):
+    """Numeric block under an exact header.
+
+    mode="flat"   -> one time series wrapped across lines; all tokens in order
+    mode="matrix" -> region across, year down; each row summed over regions
+    """
+    lines = open(path).read().split("\n")
+    try:
+        i = next(k for k, l in enumerate(lines) if l.strip() == header)
+    except StopIteration:
+        return None
+    vals = []
+    j = i + 1
+    while j < len(lines) and lines[j].strip() and not lines[j].strip().startswith("#"):
+        row = [float(t) for t in lines[j].split()]
+        if mode == "matrix":
+            vals.append(sum(row))
+        else:
+            vals.extend(row)
+        j += 1
+    return np.array(vals) if vals else None
+
+
 def tag_block_split(path, mixing):
     """Tag likelihood split into mixing-window and post-mixing parts.
 
@@ -202,6 +264,7 @@ def run_one(job):
                          if os.path.exists(tpo) else np.nan)
     mx, po = tag_block_split(tpo, job["mixing"]) if os.path.exists(tpo) else (np.nan, np.nan)
     rec["tag_mix"], rec["tag_post"] = mx, po
+    rec.update(derived_quantities(os.path.join(d, "plot-out.par.rep")))
     rec["seconds"] = wall
     rec["ok"] = int(np.isfinite(rec["objective"]))
     shutil.rmtree(d, ignore_errors=True)
