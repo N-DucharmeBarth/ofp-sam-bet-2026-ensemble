@@ -1,6 +1,6 @@
 """Isolate the survival-floor penalty from the fixed-parameter profile.
 
-Resolves an open question in the SC22 review, which could not determine from
+Resolves an open question in the US review, which could not determine from
 source alone which Newton-Raphson variant the assessment binary uses:
 
   "the source defines more than one version of the routine that performs this
@@ -100,7 +100,7 @@ def main():
     check(
         "task10.binary-carries-the-cap-and-honours-the-flag",
         inc.resid_range.max() > 100.0 and exc.resid_range.max() < 1.0,
-        "resolves the SC22 open question empirically: the 2.2.7.9 binary both "
+        "resolves the US review's open question empirically: the 2.2.7.9 binary both "
         "honours tag_flags(i,2) (the arms differ) and applies the posfun cap "
         "(an unexplained penalty term appears under `include` at low X only)",
     )

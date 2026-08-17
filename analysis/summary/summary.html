@@ -344,7 +344,8 @@
   <p class="tag">BET 2026 ensemble · tag reporting rates · synthesis</p>
   <h1>The two tag reporting-rate settings do not bracket the answer</h1>
   <p class="standfirst">Two investigations into the tagged-fish reporting-rate penalty, read alongside
-  the SC22 tag analysis. The setting that declines to correct for reporting inserts pseudo-data into
+  a tag analysis by United States stock assessment scientists. The setting that declines to correct for
+  reporting inserts pseudo-data into
   the likelihood on <strong>{{N_WIN}} of 98</strong> tag release groups. The setting that does correct
   trips a numerical guard on <strong>{{N_FLOOR}}</strong>. Neither is unbiased; their limitations
   differ in kind and in direction, and the two do not span the quantity the grid treats them as
@@ -450,7 +451,7 @@ release groups, while the alternative affects <strong>{{N_WIN}} of 98</strong>, 
 {{PREVALENCE_RATIO}} times as many, in every model. <strong>Here, the problem the manual's preference
 avoids is the smaller of the two.</strong></p>
 
-<p>The deeper point, from the SC22 review, is that <em>both</em> options fix the tagged population
+<p>The deeper point, from the United States review, is that <em>both</em> options fix the tagged population
 deterministically from the observed returns, with no uncertainty and no test against what the model
 predicts. A large share of the tagging data steers the assessment without ever being fitted. The
 durable fix is to change MFCL so mixing-period recaptures are predicted from the tagged cohort and
@@ -468,6 +469,13 @@ mixed, and the difficulty it runs into is genuine. Every source claim is transcr
 at a named commit, every number is produced by scripts in this repository, and the links in the footer
 resolve to the public commits the analysis was run against, so any statement here can be checked or
 contradicted directly.</p>
+
+<p class="lede">A note on attribution. The companion tag analysis cited throughout is the work of
+<strong>United States stock assessment scientists</strong> and is referred to here as the US review.
+Its repository is named for the meeting it was prepared for, but it is not an output of SC22 or of the
+Scientific Committee, and no conclusion in this document should be attributed to either. The findings
+and recommendations below are our own. The one genuine SC22 citation is the tag-seeding information
+paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
 
 <section>
   <p class="eyebrow">Part 1 · <b>the original question</b></p>
@@ -592,7 +600,7 @@ contradicted directly.</p>
 
   <p>The pre-registered stop condition was that the <span class="arm-i">include</span> curve be flat
   everywhere. Over the whole sweep it is not, reaching up to {{FLAT_WORST}}%. The reason is the
-  survival guard, and isolating it turns out to answer a question the SC22 review left open
+  survival guard, and isolating it turns out to answer a question the US review left open
   (Part 3).</p>
 
   {{CHECK:task1.include-mixing-block-invariant-to-X}}
@@ -624,7 +632,7 @@ contradicted directly.</p>
   <p class="eyebrow">Part 3 · <b>resolving an open question</b></p>
   <h2>Which MFCL routine the assessment actually used</h2>
 
-  <p>The SC22 review flagged an ambiguity it could not resolve from source:</p>
+  <p>The US review flagged an ambiguity it could not resolve from source:</p>
 
   <blockquote style="margin:16px 0;padding:2px 0 2px 18px;border-left:2px solid var(--rule);color:var(--ink-2);font-style:italic;">
   &ldquo;the source defines more than one version of the routine that performs this removal, and they
@@ -680,7 +688,7 @@ contradicted directly.</p>
   <p class="eyebrow">Part 4 · <b>the deeper problem</b></p>
   <h2>Both options bypass the likelihood</h2>
 
-  <p>The SC22 review identifies a problem that both settings share, and it subsumes the mechanism
+  <p>The US review identifies a problem that both settings share, and it subsumes the mechanism
   above. Mixing-period recaptures fix the tagged population <strong>deterministically</strong>, from the
   observed returns, with no uncertainty attached and no test against what the model predicts.</p>
 
@@ -916,8 +924,8 @@ contradicted directly.</p>
         <li><strong>The third condition is the fragile one.</strong> The cap engages on {{N_FLOOR}} of 98
         release groups, and where it does the same X̂·R form partially returns. Nothing in standard
         output reports it.</li>
-        <li><strong>Small release groups are a real risk.</strong> SC22 simulations show a heavy upper
-        tail in F rather than an obvious loss of precision.</li>
+        <li><strong>Small release groups are a real risk.</strong> The US simulation study shows a
+        heavy upper tail in F rather than an obvious loss of precision.</li>
         <li><strong>The cap penalty is discarded outright</strong> for release groups 21, 72 and 112
         (hardcoded), and 21 is one that engages.</li>
         <li><strong>Numerically fragile</strong>, with {{CUM_LOSS_INC}}% of the 50 draws lost against
@@ -1135,7 +1143,7 @@ contradicted directly.</p>
     <li><strong>That either arm's rates are correct.</strong></li>
     <li><strong>A reconciled ψ̂ correction.</strong></li>
     <li><strong>The magnitude of the small-release-group risk</strong> in this assessment specifically.
-    SC22 simulation indicates a heavy upper tail in F, but we have not quantified it here.</li>
+    The US simulation study indicates a heavy upper tail in F, but we have not quantified it here.</li>
     <li><strong>How the risk figures change once estimation uncertainty is included.</strong> Every
     P(F&gt;F<sub>MSY</sub>) and P(SB&lt;LRP) figure here reflects structural uncertainty only, meaning
     the spread of single best-fitting parameter vectors across the grid, with none of the within-model
@@ -1160,19 +1168,20 @@ contradicted directly.</p>
   </ol>
 
   <h3>The durable fixes</h3>
-  <p>Both come from the SC22 review and neither is a grid adjustment.</p>
+  <p>Both come from the US review and neither is a grid adjustment.</p>
   <ol>
     <li><strong>Modify MFCL</strong> so the mixing-period likelihood terms that already exist score
     predictions generated from the projected tagged cohort, with mixing-period availability and the
     reporting rate estimated rather than assumed. This follows the original design reasoning instead of
     discarding it: the obstacle was that recaptures cannot be predicted from an unmixed cohort, so
     estimate the departure from mixing. <strong>This adds parameters to a model that already has an
-    identifiability problem, not a clean one.</strong> The same review's own diagnostics (jittering,
-    simulation self-test, parameter correlations, bounds checks) found that several parameters of the
-    2026 assessment's spatial structure are &ldquo;poorly determined and weakly identifiable&rdquo;
-    before any availability parameters are added. Layering one more per-release-group parameter onto
-    that model, with tag release groups that are mostly small and noisy, could compound the existing
-    estimability problem rather than trade it for a cleaner one. SC22 says as much of its own proposal:
+    identifiability problem, not a clean one.</strong> The assessment's own diagnostics (jittering,
+    simulation self-test, parameter correlations, bounds checks) already identified, as the authors
+    noted and the US review restates, that several parameters of the 2026 assessment's spatial
+    structure remain &ldquo;poorly determined and weakly identifiable&rdquo; before any availability
+    parameters are added. Layering one more per-release-group parameter onto that model, with tag
+    release groups that are mostly small and noisy, could compound the existing estimability problem
+    rather than trade it for a cleaner one. The US review says as much of its own proposal:
     &ldquo;it remains to be seen if the additional parameters would be identifiable.&rdquo; There is
     also a resolution requirement independent of that: an availability multiplier too coarse to span
     the true departure from mixing inflates mixing-period mortality and biases F upward instead of
@@ -1190,7 +1199,7 @@ contradicted directly.</p>
   cross-check or to inform a prior, rather than a term optimised jointly with the rest of the model.
   This sidesteps the channel-1/channel-2 pathology in Part 2 and the added-complexity risk above
   without waiting on either fix, at the cost of losing the tagging data's direct influence on the fit.
-  It is not a new SC22 recommendation. It generalises an aside in their second path, that a model not
+  It is not a new recommendation from that review. It generalises an aside in its second path, that a model not
   fitting tagging data directly can still use it &ldquo;to inform prior distributions for mortality
   parameters&rdquo;, extending that to the current spatially-explicit structure rather than tying it to
   a change in spatial resolution.</p>
@@ -1212,7 +1221,13 @@ contradicted directly.</p>
   framing, the one-sidedness argument, the three conditions for the corrected option and the two paths
   forward are drawn from
   <a href="https://github.com/N-DucharmeBarth-NOAA/sc22-tag-analysis/commit/907274faff4626de137ca274cefae1556150cd9c">N-DucharmeBarth-NOAA/sc22-tag-analysis</a>
-  (commit <code>907274f</code>).</p>
+  (commit <code>907274f</code>), referred to throughout as the US review. <strong>Note on
+  attribution:</strong> despite the repository name, which refers to the meeting the work was prepared
+  for, that analysis is the work of United States stock assessment scientists and is not an output of
+  SC22 or of the Scientific Committee. Nothing in this document should be read as an SC22 finding or
+  position. The only genuine SC22 citation here is the tag-seeding information paper SC22-SA-IP-05,
+  which supplies the reporting-rate priors. The analysis, checks and recommendations in this document
+  are our own.</p>
 
   <p><strong>Coverage.</strong> Objective components and the design table cover all 88 retained models;
   80 have a retained <code>final.par</code> and meet the MGC ≤ 1e-4 convergence criterion, and all
