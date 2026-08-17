@@ -18,6 +18,13 @@ python3 "$here/07-figures.py"
 cat out/checks-0*.txt > out/checks.tsv
 rm -f out/checks-0*.txt
 python3 "$here/08-build-report.py"
+
+# PDF needs playwright + headless chromium; skip rather than fail without them
+if python3 -c "import playwright" 2>/dev/null; then
+  python3 "$here/09-build-pdf.py"
+else
+  echo "skipping PDF: playwright not installed (pip install playwright)"
+fi
 echo
 echo "checks: $(grep -c PASS out/checks.tsv) passed, $(grep -c FAIL out/checks.tsv) failed"
 grep FAIL out/checks.tsv || true

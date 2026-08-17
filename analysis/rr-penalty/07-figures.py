@@ -95,7 +95,8 @@ def fig_arm_gap_vs_K(mix):
     ax.set_xlim(0.03, 0.37)
     h = [plt.Line2D([], [], marker="s", ls="", color=ARMC[a], ms=7,
                     label=f"{a} larger") for a in ("exclude", "include")]
-    ax.legend(handles=h, loc="lower right", ncol=1, fontsize=8)
+    # upper right: the only quadrant free of bars and of the n= labels
+    ax.legend(handles=h, loc="upper right", ncol=1, fontsize=8)
     fig.tight_layout()
     p = os.path.join(FIG, "arm-gap-vs-K.png")
     fig.savefig(p, dpi=170)
