@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import OUT  # noqa: E402
+from common import OUT, REPO  # noqa: E402
 
 FIG = os.path.join(OUT, "figures")
 INCLUDE, EXCLUDE = "#2a78d6", "#eb6834"
@@ -203,12 +203,74 @@ def fig_balance(df):
     return p
 
 
+OBJ_COMPONENTS = [
+    ("Tagged Fish Reporting Rate Penalty Contribution", "Tagged-fish reporting-rate\npenalty"),
+    ("Regional Recruitment Deviates Penalty Contribution", "Regional recruitment\ndeviates penalty"),
+    ("Unclassified objective residual", "Unclassified\nobjective residual"),
+]
+
+
+def _violin(ax, data_by_arm, x0, width, color):
+    parts = ax.violinplot([data_by_arm], positions=[x0], widths=width,
+                          showmedians=False, showextrema=False)
+    for pc in parts["bodies"]:
+        pc.set_facecolor(color)
+        pc.set_alpha(0.45)
+        pc.set_edgecolor(color)
+        pc.set_linewidth(1.3)
+    med = np.median(data_by_arm)
+    q1, q3 = np.percentile(data_by_arm, [25, 75])
+    ax.plot([x0, x0], [q1, q3], color=color, lw=3, solid_capstyle="round", zorder=4)
+    ax.scatter([x0], [med], s=46, color=color, ec=SURFACE, lw=1.6, zorder=5)
+    return med
+
+
+def fig_objective_violin(obj, design):
+    """The original motivating diagnostic: does the RR axis move the penalty,
+    and is that localised to the reporting-rate prior or smeared across the
+    fit? Restricted to the 80 converged members (has_par == True), matching
+    every adjusted estimate elsewhere in the analysis.
+    """
+    d = obj.merge(design[["member_id", "arm", "has_par"]], on="member_id")
+    d = d[d.has_par]
+    fig, axes = plt.subplots(1, 3, figsize=(10.2, 4.3), sharex=False)
+    for ax, (comp, label) in zip(axes, OBJ_COMPONENTS):
+        s = d[d.Component == comp]
+        meds = {}
+        for k, arm in enumerate(("include", "exclude")):
+            v = s[s.arm == arm].Value.dropna().values
+            meds[arm] = _violin(ax, v, k, 0.72, ARMC[arm])
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(["include", "exclude"], fontsize=9)
+        ax.set_xlim(-0.6, 1.6)
+        style(ax)
+        ax.set_title(label, fontsize=9.5)
+        gap = meds["exclude"] - meds["include"]
+        ax.annotate(f"median gap {gap:+.0f}", (0.5, 0.98), xycoords="axes fraction",
+                    ha="center", va="top", fontsize=8, color=INK2)
+    axes[0].set_ylabel("objective units")
+    h = [plt.Line2D([], [], marker="s", ls="", color=ARMC[a], ms=8, label=a)
+         for a in ("include", "exclude")]
+    fig.legend(handles=h, loc="upper center", ncol=2, fontsize=8.5,
+               bbox_to_anchor=(0.5, 1.06))
+    fig.suptitle("The RR axis moves the reporting-rate penalty, not the rest of the objective",
+                 fontsize=11, fontweight="bold", y=1.14)
+    fig.tight_layout()
+    p = os.path.join(FIG, "objective-components-violin.png")
+    fig.savefig(p, dpi=170, bbox_inches="tight")
+    plt.close(fig)
+    return p
+
+
 def main():
     os.makedirs(FIG, exist_ok=True)
     mix = pd.read_csv(os.path.join(OUT, "mixing-frame.csv"))
     exc = pd.read_csv(os.path.join(OUT, "rr-excursion-long.csv"))
     df = pd.read_csv(os.path.join(OUT, "member-frame.csv"))
-    for p in (fig_arm_gap_vs_K(mix), fig_excursion(exc), fig_balance(df)):
+    obj = pd.read_csv(os.path.join(REPO, "data", "ensemble", "objective-components.csv"))
+    obj["member_id"] = obj.ensemble_id.str.extract(r"(\d+)$").astype(int)
+    for p in (fig_arm_gap_vs_K(mix), fig_excursion(exc), fig_balance(df),
+             fig_objective_violin(obj, df)):
         print("wrote", os.path.relpath(p, os.path.dirname(OUT)))
 
 

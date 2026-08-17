@@ -468,6 +468,13 @@ that either held or did not, and failures are reported in the same form as passe
   regional recruitment penalty differs by a couple of units; the unclassified residual barely differs.
   The effect is localised in the reporting-rate prior, not smeared across the fit.</p>
 
+  <figure>
+    <img src="{{FIG_OBJ_VIOLIN}}" alt="Three violin panels comparing include and exclude across the 80 converged members. Tagged-fish reporting-rate penalty: include piles up low and thin-tailed, exclude is broad and shifted up, median gap about +29. Regional recruitment deviates penalty: median gap about +3. Unclassified objective residual: median gap about +7.">
+    <figcaption>Restricted to the 80 converged members. The <code>RR</code> axis moves the tagged-fish
+    reporting-rate penalty by roughly ten times as much as it moves either of the other two components —
+    the distributional picture behind the medians quoted above.</figcaption>
+  </figure>
+
   <p>That penalty is a prior. Tag-seeding studies (SC22-SA-IP-05) give expected reporting rates for the
   purse-seine fisheries in regions 2, 3-west and 3-east; the penalty charges the model for departing
   from them. Transcribed from <code>multifan-cl/src/callpen.cpp</code>:</p>
@@ -1133,12 +1140,34 @@ that either held or did not, and failures are reported in the same form as passe
     predictions generated from the projected tagged cohort, with mixing-period availability and the
     reporting rate estimated rather than assumed. This follows the original design reasoning instead of
     discarding it — the obstacle was that recaptures cannot be predicted from an unmixed cohort, so
-    estimate the departure from mixing. Costs: added complexity, possibly weak identifiability given
-    many small noisy release groups, and a resolution requirement — an availability multiplier too
-    coarse to span the true departure inflates mixing-period mortality and biases F upward.</li>
+    estimate the departure from mixing. <strong>This adds parameters to a model that already has an
+    identifiability problem, not a clean one.</strong> The same review's own diagnostics — jittering,
+    simulation self-test, parameter correlations, bounds checks — found that several parameters of the
+    2026 assessment's spatial structure are &ldquo;poorly determined and weakly identifiable&rdquo;
+    before any availability parameters are added. Layering one more per-release-group parameter onto
+    that model, with tag release groups that are mostly small and noisy, could compound the existing
+    estimability problem rather than trade it for a cleaner one. SC22 says as much of its own proposal:
+    &ldquo;it remains to be seen if the additional parameters would be identifiable.&rdquo; There is
+    also a resolution requirement independent of that: an availability multiplier too coarse to span
+    the true departure from mixing inflates mixing-period mortality and biases F upward instead of
+    removing the bias it targets. <strong>This is a research direction pending its own simulation
+    testing — not a fix ready to adopt — and that testing should establish identifiability before
+    implementation is considered, not after.</strong></li>
     <li><strong>Include spatially implicit, fleets-as-areas models</strong> in the grid, which sidesteps
     the tagging treatment entirely and integrates over spatial-structure uncertainty as well.</li>
   </ol>
+
+  <p>Given both of those carry open questions — one on identifiability, the other a simplification of
+  the population dynamics — a third, more pragmatic option follows directly from everything above:
+  <strong>stop fitting tag recoveries inside MFCL's joint likelihood and treat them as an external
+  analysis instead</strong> — an independent tag-based estimate of F or natural mortality used as a
+  cross-check or to inform a prior, rather than a term optimised jointly with the rest of the model.
+  This sidesteps the channel-1/channel-2 pathology in Part 2 and the added-complexity risk above
+  without waiting on either fix, at the cost of losing the tagging data's direct influence on the fit.
+  It is not a new SC22 recommendation — it generalises an aside in their second path, that a model not
+  fitting tagging data directly can still use it &ldquo;to inform prior distributions for mortality
+  parameters&rdquo; — to the current spatially-explicit structure rather than tying it to a change in
+  spatial resolution.</p>
 </section>
 
 <footer>

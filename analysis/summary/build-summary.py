@@ -225,6 +225,7 @@ def main():
         "FIG_DOWNSTREAM": img(os.path.join(C2, "figures", "downstream-arm-effects.png")),
         "FIG_DISSOC": img(os.path.join(C2, "figures", "excursion-vs-Nmix-by-arm.png")),
         "FIG_ARMGAP": img(os.path.join(OUT, "figures", "arm-gap-vs-K.png")),
+        "FIG_OBJ_VIOLIN": img(os.path.join(OUT, "figures", "objective-components-violin.png")),
     }
     for k, v in subs.items():
         html = html.replace("{{" + k + "}}", v)
