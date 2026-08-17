@@ -100,7 +100,7 @@ def _one_profile_fig(d, gid, Kof):
                 ax.set_xlabel(r"$\hat{X}_f$ for group " + str(gid))
     axes[0, 0].legend(loc="upper right", ncol=2, fontsize=8.5)
     fig.suptitle("Fixed-parameter profile against the reporting rate "
-                 f"(group {gid}) — rings mark each arm's argmin",
+                 f"(group {gid}); rings mark each arm's argmin",
                  fontsize=11, fontweight="bold", y=1.0)
     fig.tight_layout()
     p = os.path.join(FIG, f"profile-by-arm-g{gid}.png")
