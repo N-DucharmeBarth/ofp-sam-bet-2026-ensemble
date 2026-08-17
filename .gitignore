@@ -4,3 +4,6 @@ __pycache__/
 *.pyc
 retained-final-pars/
 bet-2026-ensemble-retained-final-pars-*.tar.gz
+
+# reporting-rate penalty analysis: parsed-par cache
+analysis/rr-penalty/.par-cache.pkl
