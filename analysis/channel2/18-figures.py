@@ -278,12 +278,21 @@ def fig_component_profile():
             ax.plot(sub.X, y_tot, marker="o", color=tot_color, lw=2.4, ms=4,
                     ls="--", label=tot_label, zorder=4)
             ax.axhline(0, color=GRID, lw=1, zorder=1)
-            ax.set_ylim(bottom=-0.02 * ax.get_ylim()[1])
+            # symlog, not log10(y + epsilon): every delta here is >= 0 and
+            # many are exactly 0 (the flat components), so a plain log needs
+            # an arbitrary additive constant to avoid log(0) and that
+            # constant distorts the small values. symlog instead has a
+            # genuine linear region below linthresh -- exact zeros sit
+            # exactly at 0, not at some epsilon-dependent offset -- and logs
+            # everything above it, which is what the 6-order-of-magnitude
+            # range here (0 to ~31000) actually needs.
+            ax.set_yscale("symlog", linthresh=1, linscale=0.6)
+            ax.set_ylim(bottom=0)
             style(ax)
             ax.set_title(f"group {g}, {arm}", fontsize=9.5,
                          color=ARMC[arm])
             if ai == 0:
-                ax.set_ylabel("Δ from this component's own minimum")
+                ax.set_ylabel("Δ from this component's own minimum (symlog)")
             if gi == len(groups) - 1:
                 ax.set_xlabel("X (reporting rate assumed for this group)")
     handles, labels = axes[0][0].get_legend_handles_labels()
