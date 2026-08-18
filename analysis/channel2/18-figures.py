@@ -221,6 +221,7 @@ COMPONENT_STYLE = {
     "age_length_total": ("#1a9850", "age-length data"),
     "survey_index_total": ("#6a3d9a", "survey/CPUE index"),
 }
+TOTAL_STYLE = ("#111111", "total objective")
 
 
 def fig_component_profile():
@@ -236,6 +237,22 @@ def fig_component_profile():
     objective units of range, not just approximately), so their delta-NLL
     is identically 0 everywhere -- flat at the axis floor because they have
     no minimum being profiled, not because of the normalisation choice.
+
+    The black line is the total objective, same delta-from-own-minimum
+    treatment. Under `exclude` it equals the sum of the three tag terms to
+    within floating-point noise (residual range ~1e-6), confirming again
+    that exclude never touches the survival floor. Under `include` it runs
+    above that sum by the floor-cap residual from Part 3/Task 10 -- and
+    that residual is wildly different in scale between the two groups
+    shown: ~3 objective units for group 18 (matching the "costs at most a
+    few units" finding already in the document) but ~31,000 units for
+    group 7 at the low end of this sweep (X=0.30, well below its own
+    fitted rate of ~0.52). The cap is not a mild, uniform tax -- it is a
+    steep, group-specific cliff, and this sweep happens to run far enough
+    left to fall off it for group 7. Both groups' own fitted rates sit
+    safely past where the residual plateaus, which is why the fitted-rate
+    cost stays small in practice; this is what the cost would look like if
+    a fit were pulled further down that cliff than these ones were.
     """
     path = os.path.join(OUT, "component-profile-sweep.csv")
     if not os.path.exists(path):
@@ -256,6 +273,10 @@ def fig_component_profile():
             for comp, (color, label) in COMPONENT_STYLE.items():
                 y = sub[comp].values - sub[comp].values.min()
                 ax.plot(sub.X, y, "-o", color=color, lw=1.8, ms=3.5, label=label, zorder=3)
+            tot_color, tot_label = TOTAL_STYLE
+            y_tot = sub.objective.values - sub.objective.values.min()
+            ax.plot(sub.X, y_tot, marker="o", color=tot_color, lw=2.4, ms=4,
+                    ls="--", label=tot_label, zorder=4)
             ax.axhline(0, color=GRID, lw=1, zorder=1)
             ax.set_ylim(bottom=-0.02 * ax.get_ylim()[1])
             style(ax)
@@ -266,7 +287,7 @@ def fig_component_profile():
             if gi == len(groups) - 1:
                 ax.set_xlabel("X (reporting rate assumed for this group)")
     handles, labels = axes[0][0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", ncol=3, fontsize=8.3,
+    fig.legend(handles, labels, loc="upper center", ncol=4, fontsize=8.3,
                bbox_to_anchor=(0.5, 1.05 if len(groups) == 1 else 1.03))
     fig.suptitle(f"Only the tag terms respond to X-hat (member {member}, fixed parameters)",
                  fontsize=11, fontweight="bold", y=1.12 if len(groups) == 1 else 1.08)
