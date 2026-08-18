@@ -226,12 +226,16 @@ COMPONENT_STYLE = {
 def fig_component_profile():
     """Task 12: every likelihood component on one axis, per (group, arm).
 
-    y is each component's own value minus its value at the first grid point,
-    so a hundred-thousand-unit length-frequency total and a two-hundred-unit
-    reporting-rate penalty share one meaningful axis. The tag terms move;
-    everything else sits pinned to zero -- component-profile-sweep.csv shows
-    that hold to 0.0 objective units across all 112 evaluations, not just
-    approximately.
+    y is each component's own delta-NLL: its value at each X minus its OWN
+    minimum over the sweep, so every curve's floor is exactly 0 -- a proper
+    profile-likelihood presentation, not an arbitrary offset from the first
+    grid point. A hundred-thousand-unit length-frequency total and a
+    two-hundred-unit reporting-rate penalty still share one meaningful axis.
+    The tag terms trace out a real profile; the non-tag components are
+    constant across the sweep (component-profile-sweep.csv: exactly 0.0
+    objective units of range, not just approximately), so their delta-NLL
+    is identically 0 everywhere -- flat at the axis floor because they have
+    no minimum being profiled, not because of the normalisation choice.
     """
     path = os.path.join(OUT, "component-profile-sweep.csv")
     if not os.path.exists(path):
@@ -250,14 +254,15 @@ def fig_component_profile():
             ax = axes[gi][ai]
             sub = d[(d.group_id == g) & (d.arm == arm)]
             for comp, (color, label) in COMPONENT_STYLE.items():
-                y = sub[comp].values - sub[comp].values[0]
+                y = sub[comp].values - sub[comp].values.min()
                 ax.plot(sub.X, y, "-o", color=color, lw=1.8, ms=3.5, label=label, zorder=3)
             ax.axhline(0, color=GRID, lw=1, zorder=1)
+            ax.set_ylim(bottom=-0.02 * ax.get_ylim()[1])
             style(ax)
             ax.set_title(f"group {g}, {arm}", fontsize=9.5,
                          color=ARMC[arm])
             if ai == 0:
-                ax.set_ylabel("value − value at X=0.30")
+                ax.set_ylabel("Δ from this component's own minimum")
             if gi == len(groups) - 1:
                 ax.set_xlabel("X (reporting rate assumed for this group)")
     handles, labels = axes[0][0].get_legend_handles_labels()
