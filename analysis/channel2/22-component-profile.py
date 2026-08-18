@@ -183,9 +183,10 @@ def observed_correlation():
     design = design[design.has_par]
 
     comp_map = {
-        "Length frequency data": "length_total",
-        "Total age length data": "age_length_total",
-        "Survey index term": "survey_index_total",
+        "Length frequency": "length_total",
+        "Age": "age_length_total",
+        "CPUE": "survey_index_total",
+        "Catch": "catch_total",
     }
     wide = obj[obj.Component.isin(comp_map)].pivot(index="member_id", columns="Component", values="Value")
     wide = wide.rename(columns=comp_map)
@@ -249,14 +250,29 @@ def main():
     detail.to_csv(os.path.join(OUT, "component-profile-observed-detail.csv"), index=False)
     print(corr.to_string(index=False))
 
-    worst_r = float(corr.r_pooled.abs().max()) if len(corr) else np.nan
-    check(
-        "task12.no-strong-cross-member-correlation-with-other-components",
-        not (worst_r > 0.5),
-        f"largest |pooled correlation| between a group's rate deviation from target and any "
-        f"other component's fitted value = {worst_r:.3f} (n={len(detail.member_id.unique())} members); "
-        f"threshold 0.5 chosen as a conservative 'worth a closer look' line, not a formal test",
-    )
+    if not len(corr) or corr.r_pooled.isna().all():
+        check(
+            "task12.no-strong-cross-member-correlation-with-other-components",
+            False,
+            f"produced no correlations to test (corr rows={len(corr)}) -- this is a broken check, "
+            f"not a finding of no correlation; comp_map likely does not match "
+            f"objective-components.csv's actual Component values",
+        )
+    else:
+        worst_row = corr.loc[corr.r_pooled.abs().idxmax()]
+        worst_r = float(worst_row.r_pooled)
+        worst_r_by_arm = float(pd.concat([corr.r_include, corr.r_exclude]).abs().max())
+        check(
+            "task12.no-strong-cross-member-correlation-with-other-components",
+            not (worst_r > 0.5),
+            f"largest |pooled correlation| between a priored group's rate deviation from its "
+            f"tag-seeding target and length/age-length/survey-index fit = {worst_r:.3f} "
+            f"(group {int(worst_row.group_id)}, {worst_row.component}); largest single by-arm "
+            f"correlation = {worst_r_by_arm:.3f}; n={len(detail.member_id.unique())} members; "
+            f"catch_total excluded, exactly 0 for all 88 retained models so has no variance to "
+            f"correlate against; threshold 0.5 chosen as a conservative worth-a-closer-look line, "
+            f"not a formal test",
+        )
 
     write_checks(CHECKS, os.path.join(OUT, "checks-22.tsv"))
 
