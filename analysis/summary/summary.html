@@ -342,14 +342,14 @@
 
 <header>
   <p class="tag">BET 2026 ensemble · tag reporting rates · synthesis</p>
-  <h1>The two tag reporting-rate settings do not bracket the answer</h1>
+  <h1>The two tag reporting-rate settings bracket each other, not the truth</h1>
   <p class="standfirst">Two investigations into the tagged-fish reporting-rate penalty, read alongside
   a tag analysis by United States stock assessment scientists. The setting that declines to correct for
   reporting inserts pseudo-data into
   the likelihood on <strong>{{N_WIN}} of 98</strong> tag release groups. The setting that does correct
-  trips a numerical guard on <strong>{{N_FLOOR}}</strong>. Neither is unbiased; their limitations
-  differ in kind and in direction, and the two do not span the quantity the grid treats them as
-  spanning.</p>
+  trips a numerical guard on <strong>{{N_FLOOR}}</strong>. The two do span a range of fishing
+  mortality, but the range is anchored on the <em>estimated</em> reporting rate rather than the true
+  one, and in this assessment both endpoints plausibly sit on the same side of the answer.</p>
   <p class="meta">{{N_PASS}} of {{N_CHECKS}} named checks held · 100 drawn · 88 ran · <b>80 converged (MGC ≤ 1e-4)</b> · 168 fixed-parameter MFCL evaluations</p>
 </header>
 
@@ -428,13 +428,31 @@ also the reason the two arms are not evenly represented, since the surviving
 <span class="arm-i">include</span> models are the ones where the correction happened to be
 well-behaved.</p>
 
-<h3>Including both does not bracket the answer</h3>
+<h3>The two options bracket each other, not the truth</h3>
 
-<p>The usual reason to carry two options in an uncertainty grid is that the truth probably sits
-between them. That reasoning does not apply here. Assuming complete reporting <em>cannot
-mathematically</em> remove more tags than correcting for reporting does. The two options are
-one-sided, not bracketing: running both widens the spread of results without bounding fishing
-mortality or stock size from the direction that matters.</p>
+<p>The two settings do span a range. Correcting for reporting can never remove fewer tags than not
+correcting, so F under <span class="arm-e">exclude</span> sits at or below F under
+<span class="arm-i">include</span>, and the grid does therefore report an interval. That much is
+correct. The question is whether that interval is likely to contain the right answer, and there are
+two reasons to think it is not.</p>
+
+<p><strong>An interval is only as good as its endpoints.</strong> If
+<span class="arm-i">include</span> is unbiased under its stated conditions, then
+<span class="arm-e">exclude</span> sits below it by construction. Carrying both then averages an
+unbiased estimate with a biased one. That does not produce a wider honest interval; it moves the
+central estimate.</p>
+
+<p><strong>Both endpoints can sit on the same side of the truth.</strong> The raising each option
+applies depends on the <em>estimated</em> reporting rate, not the true one, and the true rate is not
+known. In this assessment the fitted rates land above the independent tag-seeding evidence in all five
+priored groups. If the seeding trials are nearer the truth, then both settings raise the removal by
+too little, both remove too few tags, and both understate F. The interval between them would then lie
+below the answer rather than around it.</p>
+
+<p>The defensible claim is not that the true reporting rate is known, nor that the two options cannot
+be ordered. It is that the true rate is almost certainly not 1.00, which is what
+<span class="arm-e">exclude</span> assumes. A setting with a very low probability of being correct is
+a poor candidate for a grid axis, whichever side of the other option it falls on.</p>
 
 <h3>What we recommend</h3>
 
@@ -732,13 +750,50 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   population and still have to be removed from it. Desensitising the likelihood did not desensitise the
   model.</p>
 
-  <h3>The one-sidedness argument</h3>
-  <p>This is the strongest reason the axis does not belong in an uncertainty grid, and it needs no part
-  of the channel-2 account. Assuming complete reporting <strong>cannot mathematically remove more tags
-  than correcting for reporting does</strong>. The two options are one-sided. If estimated F rises with
-  the ratio of recaptured to total tags, as it should, then assuming complete reporting imposes a
-  <em>cap</em> on estimated F relative to the corrected option. Carrying both therefore widens the
-  reported spread without bounding F or population scale from the direction that matters.</p>
+  <h3>The one-sidedness argument, stated carefully</h3>
+
+  <p>This argument needs no part of the channel-2 account, but it is worth separating what it does and
+  does not establish, because the two are easy to conflate.</p>
+
+  <p><strong>What is not in dispute.</strong> Assuming complete reporting cannot remove more tags than
+  correcting for reporting does. If estimated F rises with the ratio of recaptured to total tags, as it
+  should, then <span class="arm-e">exclude</span> yields an F at or below <span class="arm-i">include</span>
+  for the same cell. The two options are therefore ordered, and running both does report an interval in
+  F. Describing that interval as a bound on the <em>adjustment</em>, between a raising factor of 1.00
+  and one of 1/X̂, is a fair description of what the grid does.</p>
+
+  <p><strong>What that interval does not establish.</strong> Ordered is not the same as containing the
+  answer, and two things stand between them.</p>
+
+  <p>The first is the status of the endpoints. Take the conditions under which
+  <span class="arm-i">include</span> is unbiased as given: the estimated rate is about right, release
+  groups are large enough to be informative, and the survival floor does not engage. Under those
+  conditions <span class="arm-i">include</span> is centred on the answer and
+  <span class="arm-e">exclude</span> sits below it by construction. Averaging across the axis then
+  combines an unbiased estimate with a biased one, and the product is a displaced central estimate
+  rather than a wider honest interval. This, rather than any claim about bracketing, is the direct
+  basis for preferring to retain <span class="arm-i">include</span> alone.</p>
+
+  <p>The second is that both endpoints are computed from the <em>estimated</em> reporting rate, and the
+  true rate is unknown. It may be above or below X̂. What it is almost certainly not is 1.00, which is
+  the value <span class="arm-e">exclude</span> assumes, and that alone makes
+  <span class="arm-e">exclude</span> a low-probability candidate for a grid axis. But the more
+  consequential case is the other one. <strong>If the true rate is <em>lower</em> than the fitted rate,
+  the correct raising factor 1/X<sub>true</sub> exceeds the applied factor 1/X̂, so both settings remove
+  too few tags and both understate F.</strong> The interval they span then sits below the answer
+  entirely, and no weighting across the axis recovers it.</p>
+
+  <p>That is not a hypothetical here. The fitted rates in this assessment exceed the independent
+  tag-seeding priors in <strong>5 of 5</strong> priored groups, in both arms (Part 6). To the extent
+  the seeding trials are the better estimate of the true rate, this assessment sits in exactly the case
+  where the axis is not merely one-sided but displaced as a whole, and the direction of the
+  displacement is the optimistic one.</p>
+
+  <p>The broader point is that the reporting-rate flag is a narrow proxy for a wider question. The
+  uncertainty that matters is how much the tagging data should influence the assessment at all, and an
+  axis expressing that directly would be more informative than one choosing between two removal
+  conventions. Building it is not feasible now (Part 8), which is a reason to state the present axis's
+  limits plainly, not a reason to treat it as if it spanned the uncertainty it is standing in for.</p>
 </section>
 
 <section>
@@ -937,11 +992,13 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
 
   <h3>Both settings estimate reporting rates above the external evidence</h3>
 
-  <p>The two options are sometimes described as bracketing the reporting-rate adjustment: not
+  <p>The two options are reasonably described as bracketing the reporting-rate adjustment: not
   correcting is equivalent to assuming RR = 1, which applies the smallest possible raising factor of
-  1.00, while correcting applies 1/X̂ &gt; 1. That framing holds only if X̂ is exogenous, and it is not.
-  X̂ is estimated inside the same likelihood, and in this assessment it lands well above the
-  tag-seeding evidence in <strong>both</strong> arms.</p>
+  1.00, while correcting applies 1/X̂ &gt; 1. As a statement about the two options relative to each
+  other, that is correct. It becomes a statement about the <em>truth</em> only if X̂ is exogenous, and
+  it is not. X̂ is estimated inside the same likelihood, and in this assessment it lands well above the
+  tag-seeding evidence in <strong>both</strong> arms, which places the true adjustment outside the
+  range the two options span rather than within it.</p>
 
   <div class="scroll">
   <table>
@@ -971,6 +1028,13 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   is a span in the <em>fitted</em> adjustment, and the fitted adjustment is itself displaced upward
   relative to the independent seeding estimates.</p>
 
+  <p>This is the concrete form of the general point in Part 4. A reporting rate estimated <em>above</em>
+  the true rate means a raising factor applied <em>below</em> the correct one, so too few tags are
+  removed and F is understated. That applies to both settings, since both use X̂. If the seeding trials
+  are the better guide to the true rate, the interval this axis reports does not straddle the answer in
+  this assessment; it sits below it, and the more conservative of the two options is the one further
+  away.</p>
+
   <h3>Removing the feedback into the tagged population does not remove the influence on the fit</h3>
 
   <p>A natural defence of the uncorrected setting is that it avoids circularity: with no correction,
@@ -999,11 +1063,18 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
 
     <p>Three independent reasons, none of which requires accepting the whole channel-2 account:</p>
     <ul>
-      <li><strong>One-sidedness.</strong> The options do not bracket. Carrying both cannot bound F or
-      population scale from the direction that matters, so the spread it produces is not uncertainty.</li>
+      <li><strong>Averaging over the axis displaces the estimate.</strong> The two options are ordered
+      rather than straddling: <span class="arm-e">exclude</span> yields an F at or below
+      <span class="arm-i">include</span> by construction. Where
+      <span class="arm-i">include</span>'s conditions hold, carrying both combines an unbiased estimate
+      with a biased one and shifts the central estimate rather than widening it honestly. Separately,
+      both endpoints are computed from the estimated rate, so if the true rate is below it both
+      understate F and the interval sits below the answer, which is the case the seeding evidence here
+      points to.</li>
       <li><strong>Asymmetric capability.</strong> <span class="arm-i">Include</span> can be unbiased
-      under stated conditions. <span class="arm-e">Exclude</span> is biased low unless mixing-period
-      reporting is genuinely complete, and it is not.</li>
+      under stated conditions. <span class="arm-e">Exclude</span> requires mixing-period reporting to
+      be essentially complete, a rate of 1.00, which is almost certainly not the case, so its
+      probability of being the correct setting is low.</li>
       <li><strong>Asymmetric prevalence.</strong> Established by source transcription and a
       fixed-parameter experiment: pervasive under <span class="arm-e">exclude</span>
       ({{N_WIN}} of 98 groups), localised under <span class="arm-i">include</span>
@@ -1156,9 +1227,10 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
     <li><strong>Report the diagnostic inconsistency upstream.</strong> No compute, and independent of
     the include/exclude decision.</li>
     <li><strong>Take the axis out of the grid.</strong> Present <span class="arm-i">include</span>-only,
-    or present the arms separately with the one-sidedness stated. A
-    {{EXC_PFMSY}}%-versus-{{INC_PFMSY}}% split in limit-exceedance probability follows from a modelling
-    choice rather than from uncertainty about the stock, and is better presented as such.</li>
+    or present the arms separately with their ordering stated and with the caveat that both are
+    computed from the fitted reporting rate. A {{EXC_PFMSY}}%-versus-{{INC_PFMSY}}% split in
+    limit-exceedance probability follows from a modelling choice rather than from uncertainty about the
+    stock, and is better presented as such.</li>
     <li><strong>Reconcile the ψ̂ baseline</strong> before any corrected figure circulates.</li>
     <li><strong>Then paired refits</strong>, the only instrument that can measure the downstream
     pathway now that the fixed-parameter route is closed. Time one full-path run before committing to a
@@ -1203,6 +1275,22 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   fitting tagging data directly can still use it &ldquo;to inform prior distributions for mortality
   parameters&rdquo;, extending that to the current spatially-explicit structure rather than tying it to
   a change in spatial resolution.</p>
+
+  <h3>The axis the grid would ideally carry</h3>
+
+  <p>Underlying all of this is a question the reporting-rate flag is a narrow proxy for. The
+  substantive uncertainty is not which of two removal conventions MFCL applies during mixing; it is
+  <strong>how much the tagging data should influence the assessment at all</strong>, given that a large
+  share of it enters deterministically rather than through the likelihood. An axis contrasting models
+  that fit tagging data with models that do not would express that directly, and would integrate over
+  a real and consequential uncertainty rather than over a pair of conventions that are ordered by
+  construction.</p>
+
+  <p>Constructing that axis is not feasible for this assessment cycle: it requires the non-tagged
+  configuration to exist, be tuned, and converge across the rest of the grid, which is a body of work
+  rather than a re-weighting. That is a reason to state plainly what the present axis does and does not
+  span, and to prefer the option capable of being unbiased in the meantime. It is not a reason to treat
+  the current axis as though it covered the uncertainty it stands in for.</p>
 </section>
 
 <footer>
