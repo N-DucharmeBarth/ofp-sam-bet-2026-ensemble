@@ -354,14 +354,11 @@
   <p class="tag">BET 2026 ensemble · tag reporting rates · synthesis</p>
   <h1>An overview of the scientific basis for the US position related to the bigeye stock assessment
   structural uncertainty grid</h1>
-  <p class="standfirst">The United States position on the reporting-rate axis is stated below, followed
-  by the evidence behind it: two investigations into the tagged-fish reporting-rate penalty, read
-  alongside a tag analysis by United States stock assessment scientists. The setting that declines to
-  correct for reporting inserts pseudo-data into the likelihood on <strong>{{N_WIN}} of 98</strong> tag
-  release groups. The setting that does correct trips a numerical guard on
-  <strong>{{N_FLOOR}}</strong>. The two do span a range of fishing mortality, but the range is anchored
-  on the <em>estimated</em> reporting rate rather than the true one, and in this assessment both
-  endpoints plausibly sit on the same side of the answer.</p>
+  <p class="standfirst">Not all tagged fish that are caught get reported. The assessment has to assume
+  how many, and it offers two ways of handling that assumption. The 2026 grid uses both and treats the
+  choice as uncertainty. This document explains why one of the two is the sounder choice, and why
+  carrying both does not represent uncertainty about the stock. The United States position is stated
+  first; the evidence follows.</p>
   <p class="meta">{{N_PASS}} of {{N_CHECKS}} named checks held · 100 drawn · 88 ran · <b>80 converged (MGC ≤ 1e-4)</b> · 168 fixed-parameter MFCL evaluations</p>
 </header>
 
@@ -427,36 +424,17 @@ MFCL caps the removal, and standard model output does not record that it happene
 
 <h3>Why this matters for advice</h3>
 
-<p>Reporting rates and fishing mortality trade off. If the model believes more recaptures were
-reported, it needs less fishing to explain the tags that came back. So the choice moves the answer.
-All figures below are on the <strong>{{INC_N}} + {{EXC_N}} = 80 models that met the assessment's own
-convergence criterion</strong> (maximum gradient ≤ 1e-4), which turns out to be exactly the set
-carrying a retained parameter file:</p>
+<p>Reporting rates and fishing mortality trade off against each other. Tags that come back are
+evidence of fishing. If the model assumes a larger share of recaptured tags was reported, then the tags
+it sees account for more of the fishing, and it needs less fishing to explain them. Assume a smaller
+share and the opposite follows. So an assumption about reporting is also, unavoidably, an assumption
+about how heavily the stock is fished.</p>
 
-<div class="stats">
-  <div class="stat">
-    <p class="stat-label">Chance fishing exceeds the limit</p>
-    <p class="stat-value">{{EXC_PFMSY}}% <span style="color:var(--ink-3)">vs</span> {{INC_PFMSY}}%</p>
-    <p class="stat-sub"><span class="arm-e">exclude</span> vs <span class="arm-i">include</span> models<br>(reported ensemble: {{ALL_PFMSY}}%)</p>
-  </div>
-  <div class="stat">
-    <p class="stat-label">Chance stock is below the limit</p>
-    <p class="stat-value">{{EXC_PLRP}}% <span style="color:var(--ink-3)">vs</span> {{INC_PLRP}}%</p>
-    <p class="stat-sub"><span class="arm-e">exclude</span> vs <span class="arm-i">include</span><br>(reported ensemble: {{ALL_PLRP}}%)</p>
-  </div>
-  <div class="stat">
-    <p class="stat-label">Fishing mortality</p>
-    <p class="stat-value">{{F_PCT}}%</p>
-    <p class="stat-sub">F/F<sub>MSY</sub> under <span class="arm-e">exclude</span>,<br>adjusted for every other axis</p>
-  </div>
-</div>
-
-<p class="lede">These risk figures reflect only <strong>structural</strong> uncertainty, meaning the
-spread across grid cells (h, K, τ, M0, effort creep, and the RR flag), with each cell taken at its
-single best-fitting parameter vector. They do not fold in <strong>estimation</strong> uncertainty, the
-spread of plausible parameter values <em>within</em> a single fit. Folding that in would widen every
-probability reported here and could shift the two arms' numbers unevenly; see the note below the
-adjusted arm effects for what stands in the way of computing it now.</p>
+<p>That is why the choice cannot be treated as a free modeling convention. It moves the quantities the
+advice rests on. The argument in this document is about which setting is scientifically sound, not
+about which produces a preferable answer: the case for the corrected setting rests on it being the only
+one capable of being unbiased, and would stand whichever direction the numbers happened to move.
+Part 5 reports the size of the effect for completeness.</p>
 
 <h3>The corrected setting is also the fragile one</h3>
 
@@ -464,7 +442,10 @@ adjusted arm effects for what stands in the way of computing it now.</p>
 <span class="arm-i">include</span> models were lost</strong>, either failing to build or failing to
 converge, against <strong>{{CUM_LOSS_EXC_N}} of 50</strong> for
 <span class="arm-e">exclude</span>. That is {{CUM_LOSS_INC}}% against {{CUM_LOSS_EXC}}%, a factor of
-four. Convergence failure alone runs {{MGC_FAIL_INC}}% against {{MGC_FAIL_EXC}}%.</p>
+four. Convergence failure alone runs {{MGC_FAIL_INC}}% against {{MGC_FAIL_EXC}}%. Everything reported
+below is stated on the <strong>{{INC_N}} + {{EXC_N}} = 80 models that met the assessment's own
+convergence criterion</strong> (maximum gradient ≤ 1e-4), which turns out to be exactly the set
+carrying a retained parameter file.</p>
 
 <p>This is a real cost of the corrected setting and it should be stated plainly: dividing observed
 recaptures by an estimated rate is numerically demanding, and MFCL does not always get there. It is
@@ -525,7 +506,7 @@ advice on models that do not fit tagging data at all.</p>
 that either held or did not, and failures are reported in the same form as passes.</p>
 
 <p class="lede">A note on scope. This is an analysis of one configuration choice in one assessment, not
-an evaluation of MFCL or of the 2026 assessment as a whole. The behaviour described below follows from
+an evaluation of MFCL or of the 2026 assessment as a whole. The behavior described below follows from
 a deliberate and reasonable design decision, namely not to fit recaptures from fish that have not yet
 mixed, and the difficulty it runs into is genuine. Every source claim is transcribed from a named file
 at a named commit, every number is produced by scripts in this repository, and the links in the footer
@@ -547,7 +528,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   reporting-rate penalty</strong> is the one the <code>RR</code> axis really moves, with a median near
   60 under <span class="arm-i">include</span> against 100 under <span class="arm-e">exclude</span>. The
   regional recruitment penalty differs by a couple of units; the unclassified residual barely differs.
-  The effect is localised in the reporting-rate prior, not smeared across the fit.</p>
+  The effect is localized in the reporting-rate prior, not smeared across the fit.</p>
 
   <figure>
     <img src="{{FIG_OBJ_VIOLIN}}" alt="Three violin panels comparing include and exclude across the 80 converged members. Tagged-fish reporting-rate penalty: include piles up low and thin-tailed, exclude is broad and shifted up, median gap about +29. Regional recruitment deviates penalty: median gap about +3. Unclassified objective residual: median gap about +7.">
@@ -579,7 +560,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   0.45 to 0.85.</p>
 
   <figure>
-    <img src="{{FIG_M0_CONFOUND}}" alt="Left: scatter of reporting-rate penalty against M0, coloured by arm, with a separate fitted line per arm; both slopes are positive and the lines cross rather than running parallel offset. Right: violin plot of M0 by arm, showing substantially overlapping distributions.">
+    <img src="{{FIG_M0_CONFOUND}}" alt="Left: scatter of reporting-rate penalty against M0, colored by arm, with a separate fitted line per arm; both slopes are positive and the lines cross rather than running parallel offset. Right: violin plot of M0 by arm, showing substantially overlapping distributions.">
     <figcaption>All 88 retained models, before the convergence screen. M0 predicts the penalty within
     each arm (left), which is where the R² jump comes from, but the two M0 distributions overlap
     (right), so M0 is not the thing separating <span class="arm-i">include</span> from
@@ -616,7 +597,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
 
 <section>
   <p class="eyebrow">Part 2 · <b>the mechanism</b></p>
-  <h2>Channel 2: why <span class="arm-e">exclude</span>'s in-window terms favour complete reporting</h2>
+  <h2>Channel 2: why <span class="arm-e">exclude</span>'s in-window terms favor complete reporting</h2>
 
   <p>The first investigation explained the gap by a <em>removal</em> argument: the reporting rate has an
   extra lever under <span class="arm-i">include</span>, so a smaller excursion suffices. That is correct
@@ -635,7 +616,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
       <tr><td class="lead"><span class="arm-i">include</span></td><td><code>R / X̂</code></td>
           <td><code>X̂ · (R/X̂) = R</code></td><td>X̂ cancels, so the term carries no information about it</td></tr>
       <tr><td class="lead"><span class="arm-e">exclude</span></td><td><code>R</code></td>
-          <td><code>X̂ · R</code></td><td><strong>minimised at X̂ = 1</strong>, best satisfied by complete reporting</td></tr>
+          <td><code>X̂ · R</code></td><td><strong>minimized at X̂ = 1</strong>, best satisfied by complete reporting</td></tr>
     </tbody>
   </table>
   </div>
@@ -681,7 +662,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   none of the pseudo-data pull.</p>
 
   <figure>
-    <img src="{{FIG_DISSOC}}" alt="Left: scatter of reporting-rate deviation against in-window recaptures, coloured by arm. Right: fitted slopes for in-window and post-mixing recaptures under each arm with confidence intervals; the two move in opposite directions.">
+    <img src="{{FIG_DISSOC}}" alt="Left: scatter of reporting-rate deviation against in-window recaptures, colored by arm. Right: fitted slopes for in-window and post-mixing recaptures under each arm with confidence intervals; the two move in opposite directions.">
     <figcaption>Under <span class="arm-e">exclude</span> mixing-window returns pull <em>harder</em>
     (+34%) while post-mixing returns pull <em>less</em> (−35%), both intervals excluding zero. That
     opposite movement is the signature of re-weighting toward pseudo-data.</figcaption>
@@ -706,10 +687,10 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   ambiguity sharper. At <code>multifan-cl</code> HEAD the routine actually called is
   <code>do_newton_raphson_for_tags2</code>,
   which divides by the reporting rate <strong>unconditionally</strong> and applies <strong>no
-  cap</strong>. The variant that honours the flag and carries the cap sits at
+  cap</strong>. The variant that honors the flag and carries the cap sits at
   <code>tag3.cpp:2769</code> and is never called; a third copy is commented out. The assessment binary
   is version <strong>2.2.7.9</strong> and predates that state of the source, so the source cannot
-  answer the question. The binary's own behaviour can.</p>
+  answer the question. The binary's own behavior can.</p>
 
   <p>Decompose the objective along a fixed-parameter profile. Everything except the tag terms is
   frozen, so</p>
@@ -733,7 +714,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   {{CHECK:task10.no-unexplained-objective-term-under-exclude}}
   {{CHECK:task10.binary-carries-the-cap-and-honours-the-flag}}
 
-  <p><strong>The binary both honours the flag and applies the cap.</strong> The arms differ, so the flag
+  <p><strong>The binary both honors the flag and applies the cap.</strong> The arms differ, so the flag
   is live; and an unexplained penalty appears under <span class="arm-i">include</span> only, growing as
   the raised removal grows, which no other term in the objective can produce. The residual above
   X̂ = 0.8 is not quite zero below, which is why the cancellation is near-exact rather
@@ -791,7 +772,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   <p>This was a reasonable response to a real difficulty. Tagged fish are not mixed, so predicting
   their recaptures from population-average availability is knowingly wrong, and declining to fit them is
   defensible. But unlike a data series that can simply be dropped, these fish have left the tagged
-  population and still have to be removed from it. Desensitising the likelihood did not desensitise the
+  population and still have to be removed from it. Desensitizing the likelihood did not desensitize the
   model.</p>
 
   <h3>The one-sidedness argument, stated carefully</h3>
@@ -812,7 +793,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   <p>The first is the status of the endpoints. Take the conditions under which
   <span class="arm-i">include</span> is unbiased as given: the estimated rate is about right, release
   groups are large enough to be informative, and the survival floor does not engage. Under those
-  conditions <span class="arm-i">include</span> is centred on the answer and
+  conditions <span class="arm-i">include</span> is centered on the answer and
   <span class="arm-e">exclude</span> sits below it by construction. Averaging across the axis then
   combines an unbiased estimate with a biased one, and the product is a displaced central estimate
   rather than a wider honest interval. This, rather than any claim about bracketing, is the direct
@@ -876,7 +857,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
 
   <p>The reason is structural: the reporting rate enters only the tag likelihood, its own penalty and
   the tagged-cohort solver, and the tagged cohort is fitted <em>to</em> the population without feeding
-  back into it. So the downstream effect is <strong>optimiser behaviour</strong>: the reporting rate
+  back into it. So the downstream effect is <strong>optimiser behavior</strong>: the reporting rate
   reshapes the likelihood surface and the F-related parameters relocate during estimation. That rules
   out a class of explanation, and it removes the cheap instrument, since only re-estimation can measure
   the pathway.</p>
@@ -902,8 +883,8 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   {{CHECK:task11.tagging-module-is-arm-specifically-fragile}}
   {{CHECK:task11.convergence-failure-alone-is-arm-specific}}
 
-  <p>The convergence screen therefore <em>degrades</em> the randomisation the design bought. The
-  <span class="arm-i">include</span> share falls to {{INC_SHARE_CONV}}%, and the standardised arm
+  <p>The convergence screen therefore <em>degrades</em> the randomization the design bought. The
+  <span class="arm-i">include</span> share falls to {{INC_SHARE_CONV}}%, and the standardized arm
   differences on the other axes widen: M0 to {{SMD_M0_CONV}}, effort creep to {{SMD_CREEP_CONV}},
   and K to {{SMD_K_CONV}}.</p>
 
@@ -989,7 +970,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   a quick addition, and the existing pipeline for it
   (<code>report/augment-uncertainty-projection.R</code>) requires an R toolchain with several packages
   that this analysis environment does not have. It was not attempted here.
-  <strong>The structural-only figures above should be labelled as such wherever they are used, and
+  <strong>The structural-only figures above should be labeled as such wherever they are used, and
   should not be read as the full assessment uncertainty on the arm comparison.</strong></p>
 </section>
 
@@ -1004,7 +985,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
         <li><strong>Assumes complete reporting.</strong> The model's own fitted rates contradict this for
         most of the tagging data.</li>
         <li><strong>Pseudo-data on {{N_WIN}} of 98 release groups</strong>, in every model. The in-window
-        terms are minimised at X̂ = 1 regardless of the data.</li>
+        terms are minimized at X̂ = 1 regardless of the data.</li>
         <li><strong>Known directional bias.</strong> It can never remove more tags than the corrected
         option, so wherever reporting is incomplete it leaves too many tags in the population, giving
         lower F and larger population scale.</li>
@@ -1081,7 +1062,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
 
   <h3>Removing the feedback into the tagged population does not remove the influence on the fit</h3>
 
-  <p>A natural defence of the uncorrected setting is that it avoids circularity: with no correction,
+  <p>A natural defense of the uncorrected setting is that it avoids circularity: with no correction,
   none of the parameters estimated from the tag likelihood influence the tagged population abundance at
   the end of the mixing period, so that abundance, which drives all post-mixing predictions, is not
   affected by the reporting rate. That is true as far as it goes, and it is the design intent.</p>
@@ -1095,7 +1076,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   closed by breaking the feedback into the cohort.</p>
 
   <p>The circularity is therefore cut in one direction and left open in the other, and the direction
-  left open is the one that carries the bias, because those in-window terms are minimised at X̂ = 1
+  left open is the one that carries the bias, because those in-window terms are minimized at X̂ = 1
   regardless of what the data say.</p>
 
   <div class="verdict">
@@ -1121,7 +1102,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
       probability of being the correct setting is low.</li>
       <li><strong>Asymmetric prevalence.</strong> Established by source transcription and a
       fixed-parameter experiment: pervasive under <span class="arm-e">exclude</span>
-      ({{N_WIN}} of 98 groups), localised under <span class="arm-i">include</span>
+      ({{N_WIN}} of 98 groups), localized under <span class="arm-i">include</span>
       ({{N_FLOOR}} of 98).</li>
     </ul>
 
@@ -1227,13 +1208,13 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   <h3>Established by transcription or controlled experiment</h3>
   <ul>
     <li>The penalty's exact functional form, reproduced to {{MAX_RESID}}.</li>
-    <li>That <span class="arm-e">exclude</span>'s mixing-period terms are minimised at X̂ = 1, and
+    <li>That <span class="arm-e">exclude</span>'s mixing-period terms are minimized at X̂ = 1, and
     <span class="arm-i">include</span>'s are inert in X̂ except where the cap engages.</li>
     <li>That flipping the flag alone, at frozen parameters, moves the best-fitting reporting rate up.</li>
-    <li>That the assessment binary both honours <code>tag_flags(i,2)</code> and applies the cap,
+    <li>That the assessment binary both honors <code>tag_flags(i,2)</code> and applies the cap,
     resolving an ambiguity the source at HEAD cannot.</li>
     <li>That the reporting rate cannot move F at frozen parameters; the downstream effect is optimiser
-    behaviour.</li>
+    behavior.</li>
     <li>That the in-window tag-fit diagnostic is an identity in both arms.</li>
   </ul>
 
@@ -1273,7 +1254,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
     <li><strong>Take the axis out of the grid.</strong> Present <span class="arm-i">include</span>-only,
     or present the arms separately with their ordering stated and with the caveat that both are
     computed from the fitted reporting rate. A {{EXC_PFMSY}}%-versus-{{INC_PFMSY}}% split in
-    limit-exceedance probability follows from a modelling choice rather than from uncertainty about the
+    limit-exceedance probability follows from a modeling choice rather than from uncertainty about the
     stock, and is better presented as such.</li>
     <li><strong>Reconcile the ψ̂ baseline</strong> before any corrected figure circulates.</li>
     <li><strong>Then paired refits</strong>, the only instrument that can measure the downstream
@@ -1312,10 +1293,10 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   the population dynamics, a third and more pragmatic option follows directly from everything above:
   <strong>stop fitting tag recoveries inside MFCL's joint likelihood and treat them as an external
   analysis instead</strong>, using an independent tag-based estimate of F or natural mortality as a
-  cross-check or to inform a prior, rather than a term optimised jointly with the rest of the model.
+  cross-check or to inform a prior, rather than a term optimized jointly with the rest of the model.
   This sidesteps the channel-1/channel-2 pathology in Part 2 and the added-complexity risk above
   without waiting on either fix, at the cost of losing the tagging data's direct influence on the fit.
-  It is not a new recommendation from that review. It generalises an aside in its second path, that a model not
+  It is not a new recommendation from that review. It generalizes an aside in its second path, that a model not
   fitting tagging data directly can still use it &ldquo;to inform prior distributions for mortality
   parameters&rdquo;, extending that to the current spatially-explicit structure rather than tying it to
   a change in spatial resolution.</p>
