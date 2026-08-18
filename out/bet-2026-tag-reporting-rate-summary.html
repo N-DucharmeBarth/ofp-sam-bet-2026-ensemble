@@ -431,10 +431,9 @@ share and the opposite follows. So an assumption about reporting is also, unavoi
 about how heavily the stock is fished.</p>
 
 <p>That is why the choice cannot be treated as a free modeling convention. It moves the quantities the
-advice rests on. The argument in this document is about which setting is scientifically sound, not
-about which produces a preferable answer: the case for the corrected setting rests on it being the only
-one capable of being unbiased, and would stand whichever direction the numbers happened to move.
-Part 5 reports the size of the effect for completeness.</p>
+advice rests on. The case made in this document rests on which setting is capable of being unbiased,
+and would stand regardless of which direction the numbers happened to move. Part 5 reports the size of
+the effect for completeness.</p>
 
 <h3>The corrected setting is also the fragile one</h3>
 
@@ -464,7 +463,7 @@ two reasons to think it is not.</p>
 <p><strong>An interval is only as good as its endpoints.</strong> If
 <span class="arm-i">include</span> is unbiased under its stated conditions, then
 <span class="arm-e">exclude</span> sits below it by construction. Carrying both then averages an
-unbiased estimate with a biased one. That does not produce a wider honest interval; it moves the
+unbiased estimate with a biased one. That does not widen a valid interval; it moves the
 central estimate.</p>
 
 <p><strong>Both endpoints can sit on the same side of the truth.</strong> The raising each option
@@ -796,7 +795,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
   conditions <span class="arm-i">include</span> is centered on the answer and
   <span class="arm-e">exclude</span> sits below it by construction. Averaging across the axis then
   combines an unbiased estimate with a biased one, and the product is a displaced central estimate
-  rather than a wider honest interval. This, rather than any claim about bracketing, is the direct
+  rather than a wider valid interval. This, rather than any claim about bracketing, is the direct
   basis for preferring to retain <span class="arm-i">include</span> alone.</p>
 
   <p>The second is that both endpoints are computed from the <em>estimated</em> reporting rate, and the
@@ -857,7 +856,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
 
   <p>The reason is structural: the reporting rate enters only the tag likelihood, its own penalty and
   the tagged-cohort solver, and the tagged cohort is fitted <em>to</em> the population without feeding
-  back into it. So the downstream effect is <strong>optimiser behavior</strong>: the reporting rate
+  back into it. So the downstream effect is <strong>optimizer behavior</strong>: the reporting rate
   reshapes the likelihood surface and the F-related parameters relocate during estimation. That rules
   out a class of explanation, and it removes the cheap instrument, since only re-estimation can measure
   the pathway.</p>
@@ -1092,7 +1091,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
       rather than straddling: <span class="arm-e">exclude</span> yields an F at or below
       <span class="arm-i">include</span> by construction. Where
       <span class="arm-i">include</span>'s conditions hold, carrying both combines an unbiased estimate
-      with a biased one and shifts the central estimate rather than widening it honestly. Separately,
+      with a biased one and shifts the central estimate rather than widening it validly. Separately,
       both endpoints are computed from the estimated rate, so if the true rate is below it both
       understate F and the interval sits below the answer, which is the case the seeding evidence here
       points to.</li>
@@ -1213,7 +1212,7 @@ paper SC22-SA-IP-05, which supplies the reporting-rate priors.</p>
     <li>That flipping the flag alone, at frozen parameters, moves the best-fitting reporting rate up.</li>
     <li>That the assessment binary both honors <code>tag_flags(i,2)</code> and applies the cap,
     resolving an ambiguity the source at HEAD cannot.</li>
-    <li>That the reporting rate cannot move F at frozen parameters; the downstream effect is optimiser
+    <li>That the reporting rate cannot move F at frozen parameters; the downstream effect is optimizer
     behavior.</li>
     <li>That the in-window tag-fit diagnostic is an identity in both arms.</li>
   </ul>
