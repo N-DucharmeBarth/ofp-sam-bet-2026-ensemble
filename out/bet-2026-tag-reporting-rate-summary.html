@@ -304,6 +304,15 @@
     padding: 4px 24px 20px; margin: 22px 0;
   }
   .verdict h3:first-child { margin-top: 20px; }
+  .position {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-left: 3px solid var(--include-c); border-radius: 3px;
+    padding: 4px 26px 22px; margin: 26px 0 6px;
+  }
+  .position h2 { font-size: 19px; margin-top: 22px; }
+  .position p { font-size: 16.5px; }
+  .position .src { font-size: 13.5px; color: var(--ink-3); font-style: italic;
+                   margin-top: 18px; }
   :root { --exclude-c: #b8460f; --include-c: #1b5fb5; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) { --exclude-c: #ec7a49; --include-c: #3987e5; }
@@ -325,8 +334,9 @@
   @media print {
     /* .exec and .verdict are long prose blocks -- keeping them whole strands a
        near-empty first page, so let them flow and keep the atoms intact instead */
-    .exec, .verdict { break-inside: auto; padding-left: 18px; padding-right: 18px; }
-    .exec h2, .verdict h3 { break-after: avoid; }
+    .exec, .verdict, .position { break-inside: auto; padding-left: 18px; padding-right: 18px; }
+    .exec h2, .verdict h3, .position h2 { break-after: avoid; }
+    .position p { font-size: 10.2pt; }
     .two { grid-template-columns: 1fr 1fr; break-inside: avoid; }
     .exec .stats { grid-template-columns: repeat(3, 1fr); }
     .exec .stat { padding: 12px 12px 10px; }
@@ -342,16 +352,50 @@
 
 <header>
   <p class="tag">BET 2026 ensemble · tag reporting rates · synthesis</p>
-  <h1>The two tag reporting-rate settings bracket each other, not the truth</h1>
-  <p class="standfirst">Two investigations into the tagged-fish reporting-rate penalty, read alongside
-  a tag analysis by United States stock assessment scientists. The setting that declines to correct for
-  reporting inserts pseudo-data into
-  the likelihood on <strong>96 of 98</strong> tag release groups. The setting that does correct
-  trips a numerical guard on <strong>2</strong>. The two do span a range of fishing
-  mortality, but the range is anchored on the <em>estimated</em> reporting rate rather than the true
-  one, and in this assessment both endpoints plausibly sit on the same side of the answer.</p>
+  <h1>An overview of the scientific basis for the US position related to the bigeye stock assessment
+  structural uncertainty grid</h1>
+  <p class="standfirst">The United States position on the reporting-rate axis is stated below, followed
+  by the evidence behind it: two investigations into the tagged-fish reporting-rate penalty, read
+  alongside a tag analysis by United States stock assessment scientists. The setting that declines to
+  correct for reporting inserts pseudo-data into the likelihood on <strong>96 of 98</strong> tag
+  release groups. The setting that does correct trips a numerical guard on
+  <strong>2</strong>. The two do span a range of fishing mortality, but the range is anchored
+  on the <em>estimated</em> reporting rate rather than the true one, and in this assessment both
+  endpoints plausibly sit on the same side of the answer.</p>
   <p class="meta">96 of 112 named checks held · 100 drawn · 88 ran · <b>80 converged (MGC ≤ 1e-4)</b> · 168 fixed-parameter MFCL evaluations</p>
 </header>
+
+<div class="position">
+<h2>The United States position</h2>
+
+<p><strong>As it relates to the 2026 bigeye tuna stock assessment, the United States would be prepared
+to accept the current assessment if the grid were constrained to only include the tag reporting
+adjustment models.</strong></p>
+
+<p>Working from a shared understanding of the Multifan-CL code, including the tag reporting rate
+adjustment within the mixing period is unbiased under the conditions required (e.g., the true reporting
+rate equals the estimated reporting rate, tag release groups are large enough to be informative, and
+the survival floor doesn't trigger). Excluding the tag reporting rate adjustment assumes complete
+reporting of recaptured tags, and mathematically will always remove fewer tags than including it, which
+in turn will generally result in a lower estimated fishing mortality. The assumption of complete
+reporting is implausible given tag seeding experiments and inspection of the assessment input files. We
+would therefore be averaging an estimate that is capable of being unbiased with one that is biased by
+construction, with the net result potentially inducing a bias into the overall uncertainty grid. This is
+the basis for our preference to only retain runs that include the adjustment as they are the only ones
+theoretically capable of providing an unbiased estimate.</p>
+
+<p>This relates to a larger fundamental uncertainty relative to the influence of tagging data which ties
+back to our initial recommendation that a more appropriate grid axis would integrate across the
+inclusion/exclusion of tagging data in the model. However, this work is not possible at this time so
+what we are currently proposing would be a compromise until future work informing this issue can be
+completed.</p>
+
+<p class="src">The remainder of this document sets out the analysis supporting that position. Each
+element of the position above is taken up in turn: the conditions for an unbiased corrected estimate in
+Part 6, the ordering of the two options and what it does and does not establish in Part 4, the
+comparison of fitted rates against the tag-seeding experiments in Part 6, the effect on derived
+management quantities in Part 5, and the wider tagging-data axis in Part 8.</p>
+</div>
 
 <div class="exec">
 <h2>Executive summary</h2>
@@ -454,7 +498,7 @@ be ordered. It is that the true rate is almost certainly not 1.00, which is what
 <span class="arm-e">exclude</span> assumes. A setting with a very low probability of being correct is
 a poor candidate for a grid axis, whichever side of the other option it falls on.</p>
 
-<h3>What we recommend</h3>
+<h3>What the analysis supports</h3>
 
 <p><strong>If models fitted to tagging data must inform advice, use <span class="arm-i">include</span>
 only.</strong> It is capable of being right under stated conditions; <span class="arm-e">exclude</span>
