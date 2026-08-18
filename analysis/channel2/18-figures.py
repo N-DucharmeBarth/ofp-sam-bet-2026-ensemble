@@ -222,6 +222,7 @@ COMPONENT_STYLE = {
     "survey_index_total": ("#6a3d9a", "survey/CPUE index"),
 }
 TOTAL_STYLE = ("#111111", "total objective")
+RESID_STYLE = ("#7a7a7a", "inferred floor-cap residual (objective − Σ tag terms)")
 
 
 def fig_component_profile():
@@ -253,6 +254,17 @@ def fig_component_profile():
     safely past where the residual plateaus, which is why the fitted-rate
     cost stays small in practice; this is what the cost would look like if
     a fit were pulled further down that cliff than these ones were.
+
+    The grey dotted line makes that residual explicit rather than leaving
+    it to be read off as the gap between the black and coloured lines: it
+    is objective minus (rr_penalty + tag_mix + tag_post), same
+    delta-from-own-minimum treatment. "Inferred" because it is not a
+    labelled block in test_plot_output -- it is arithmetic, the same
+    residual-by-subtraction construction Task 10 used to isolate the
+    survival-floor penalty from a fixed-parameter profile in the first
+    place. Under exclude it should sit at the axis floor throughout
+    (nothing left over to explain); under include it traces the cap curve
+    directly.
     """
     path = os.path.join(OUT, "component-profile-sweep.csv")
     if not os.path.exists(path):
@@ -277,6 +289,12 @@ def fig_component_profile():
             y_tot = sub.objective.values - sub.objective.values.min()
             ax.plot(sub.X, y_tot, marker="o", color=tot_color, lw=2.4, ms=4,
                     ls="--", label=tot_label, zorder=4)
+            resid_color, resid_label = RESID_STYLE
+            resid = (sub.objective.values
+                      - (sub.rr_penalty.values + sub.tag_mix.values + sub.tag_post.values))
+            y_resid = resid - resid.min()
+            ax.plot(sub.X, y_resid, marker="s", color=resid_color, lw=1.4, ms=3,
+                    ls=":", label=resid_label, zorder=2)
             ax.axhline(0, color=GRID, lw=1, zorder=1)
             # symlog, not log10(y + epsilon): every delta here is >= 0 and
             # many are exactly 0 (the flat components), so a plain log needs
