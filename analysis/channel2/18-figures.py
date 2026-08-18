@@ -325,9 +325,67 @@ def fig_component_profile():
     return p
 
 
+def fig_component_profile_pct():
+    """Companion to fig_component_profile: percent of each component's own
+    level, not delta-NLL. The delta-NLL/symlog view makes every curve's
+    SHAPE comparable, which is exactly what buries the "include" mixing-
+    window cancellation -- a 0.146-unit wobble on a 2465-unit base draws
+    the same kind of sweeping curve as a genuine 770-unit response, because
+    both get rescaled to start at 0 and both get logged. This view answers
+    a different question: how big is the move relative to what the term
+    normally is. Restricted to the six extracted components (three tag
+    terms, three flat non-tag ones) -- the total objective and the
+    inferred floor-cap residual are deliberately left off. Their own means
+    are dominated by ~90,000 objective units of background from every
+    OTHER group and data source, unrelated to sweeping this one group, so
+    "percent of own level" would understate them by orders of magnitude
+    rather than reveal anything; they belong on the absolute-units plot.
+    """
+    path = os.path.join(OUT, "component-profile-sweep.csv")
+    if not os.path.exists(path):
+        return None
+    d = pd.read_csv(path)
+    d = d[d.ok == 1]
+    member = int(d.member_id.min())
+    d = d[d.member_id == member].sort_values("X")
+
+    groups = sorted(d.group_id.unique())
+    arms = ["include", "exclude"]
+    fig, axes = plt.subplots(len(groups), len(arms), figsize=(10.5, 4.6 * len(groups)),
+                              sharex=True, squeeze=False)
+    for gi, g in enumerate(groups):
+        for ai, arm in enumerate(arms):
+            ax = axes[gi][ai]
+            sub = d[(d.group_id == g) & (d.arm == arm)]
+            for comp, (color, label) in COMPONENT_STYLE.items():
+                v = sub[comp].values
+                y = 100.0 * (v - v.min()) / abs(v.mean())
+                ax.plot(sub.X, y, "-o", color=color, lw=1.8, ms=3.5, label=label, zorder=3)
+            ax.axhline(0, color=GRID, lw=1, zorder=1)
+            ax.set_ylim(bottom=-2)
+            style(ax)
+            ax.set_title(f"group {g}, {arm}", fontsize=9.5, color=ARMC[arm])
+            if ai == 0:
+                ax.set_ylabel("% of this component's own mean level")
+            if gi == len(groups) - 1:
+                ax.set_xlabel("X (reporting rate assumed for this group)")
+    handles, labels = axes[0][0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=3, fontsize=8.3,
+               bbox_to_anchor=(0.5, 1.05 if len(groups) == 1 else 1.03))
+    fig.suptitle(f"How big is the move relative to each term's own size? "
+                 f"(member {member}, fixed parameters)",
+                 fontsize=11, fontweight="bold", y=1.12 if len(groups) == 1 else 1.08)
+    fig.tight_layout()
+    p = os.path.join(FIG, "component-profile-pct.png")
+    fig.savefig(p, dpi=170, bbox_inches="tight")
+    plt.close(fig)
+    return p
+
+
 def main():
     os.makedirs(FIG, exist_ok=True)
-    for f in (fig_excursion_vs_nmix, fig_downstream, fig_profiles, fig_component_profile):
+    for f in (fig_excursion_vs_nmix, fig_downstream, fig_profiles, fig_component_profile,
+              fig_component_profile_pct):
         r = f()
         for p in (r if isinstance(r, list) else [r]):
             if p:
