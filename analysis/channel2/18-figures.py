@@ -213,9 +213,68 @@ def fig_downstream():
     return p
 
 
+COMPONENT_STYLE = {
+    "rr_penalty": ("#c0392b", "reporting-rate penalty (this group)"),
+    "tag_mix": ("#e67e22", "tag likelihood, mixing window"),
+    "tag_post": ("#f1c40f", "tag likelihood, post-mixing"),
+    "length_total": ("#2c7fb8", "length-frequency data (all fisheries)"),
+    "age_length_total": ("#1a9850", "age-length data"),
+    "survey_index_total": ("#6a3d9a", "survey/CPUE index"),
+}
+
+
+def fig_component_profile():
+    """Task 12: every likelihood component on one axis, per (group, arm).
+
+    y is each component's own value minus its value at the first grid point,
+    so a hundred-thousand-unit length-frequency total and a two-hundred-unit
+    reporting-rate penalty share one meaningful axis. The tag terms move;
+    everything else sits pinned to zero -- component-profile-sweep.csv shows
+    that hold to 0.0 objective units across all 112 evaluations, not just
+    approximately.
+    """
+    path = os.path.join(OUT, "component-profile-sweep.csv")
+    if not os.path.exists(path):
+        return None
+    d = pd.read_csv(path)
+    d = d[d.ok == 1]
+    member = int(d.member_id.min())  # one member throughout: isolates (X, arm, group)
+    d = d[d.member_id == member].sort_values("X")
+
+    groups = sorted(d.group_id.unique())
+    arms = ["include", "exclude"]
+    fig, axes = plt.subplots(len(groups), len(arms), figsize=(10.5, 4.6 * len(groups)),
+                              sharex=True, squeeze=False)
+    for gi, g in enumerate(groups):
+        for ai, arm in enumerate(arms):
+            ax = axes[gi][ai]
+            sub = d[(d.group_id == g) & (d.arm == arm)]
+            for comp, (color, label) in COMPONENT_STYLE.items():
+                y = sub[comp].values - sub[comp].values[0]
+                ax.plot(sub.X, y, "-o", color=color, lw=1.8, ms=3.5, label=label, zorder=3)
+            ax.axhline(0, color=GRID, lw=1, zorder=1)
+            style(ax)
+            ax.set_title(f"group {g}, {arm}", fontsize=9.5,
+                         color=ARMC[arm])
+            if ai == 0:
+                ax.set_ylabel("value − value at X=0.30")
+            if gi == len(groups) - 1:
+                ax.set_xlabel("X (reporting rate assumed for this group)")
+    handles, labels = axes[0][0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=3, fontsize=8.3,
+               bbox_to_anchor=(0.5, 1.05 if len(groups) == 1 else 1.03))
+    fig.suptitle(f"Only the tag terms respond to X-hat (member {member}, fixed parameters)",
+                 fontsize=11, fontweight="bold", y=1.12 if len(groups) == 1 else 1.08)
+    fig.tight_layout()
+    p = os.path.join(FIG, "component-profile.png")
+    fig.savefig(p, dpi=170, bbox_inches="tight")
+    plt.close(fig)
+    return p
+
+
 def main():
     os.makedirs(FIG, exist_ok=True)
-    for f in (fig_excursion_vs_nmix, fig_downstream, fig_profiles):
+    for f in (fig_excursion_vs_nmix, fig_downstream, fig_profiles, fig_component_profile):
         r = f()
         for p in (r if isinstance(r, list) else [r]):
             if p:
