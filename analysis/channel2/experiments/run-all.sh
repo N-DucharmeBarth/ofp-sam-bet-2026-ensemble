@@ -41,7 +41,24 @@ STAGE2=(
 run_one() {
   local id=$1
   local log="$LOGDIR/${id}.log"
+  local run_dir="$REPO/runs/experiments/$id"
   local rc
+
+  # Self-resuming: a completed run (final.par present) is skipped outright.
+  # A directory that exists WITHOUT final.par is the signature of an
+  # interrupted run (this environment's container has been reclaimed
+  # mid-run before, silently, taking every process with it) -- remove it
+  # so run-experiment's empty-directory check doesn't just error out, and
+  # redo that run from Phase 0.
+  if [ -f "$run_dir/final.par" ]; then
+    echo "$id exit=0 $(date -u +%FT%TZ) (already completed, skipped)" >> "$LOGDIR/status.log"
+    return 0
+  fi
+  if [ -e "$run_dir" ]; then
+    echo "$(date -u +%FT%TZ) $id: removing incomplete run directory from an interrupted attempt" >> "$LOGDIR/status.log"
+    rm -rf "$run_dir"
+  fi
+
   {
     echo "START $id: $(date -u +%FT%TZ)"
     time "$HERE/../run-experiment" "$id"
