@@ -1,0 +1,26 @@
+outcome,column,spec,term,n,estimate,se,ci_lo,ci_hi,p_value,r_squared,mean_outcome
+F_recent / F_MSY,f_recent_fmsy,continuous axes,arm (exclude - include),88,-0.166427,0.0342977,-0.234669,-0.0981855,5.825e-06,0.6511,0.900697
+F_recent / F_MSY,f_recent_fmsy,discrete axes as factors,arm (exclude - include),88,-0.15858,0.0343392,-0.227034,-0.090126,1.652e-05,0.7238,0.900697
+F_recent / F_MSY,f_recent_fmsy,arm x K interaction,arm:K,88,0.553063,0.444841,-0.332199,1.43832,0.2174,0.6577,0.900697
+SB_recent / SB_0 (depletion),sb_recent_sb0,continuous axes,arm (exclude - include),88,0.0533756,0.0137179,0.0260814,0.0806698,0.0002038,0.5023,0.269211
+SB_recent / SB_0 (depletion),sb_recent_sb0,discrete axes as factors,arm (exclude - include),88,0.0528362,0.01415,0.0246287,0.0810438,0.0003739,0.5818,0.269211
+SB_recent / SB_0 (depletion),sb_recent_sb0,arm x K interaction,arm:K,88,-0.408213,0.173737,-0.753961,-0.0624662,0.02126,0.5344,0.269211
+SB_recent / SB_MSY,sb_recent_sbmsy,continuous axes,arm (exclude - include),88,0.248573,0.0705715,0.108158,0.388988,0.000706,0.6169,1.52108
+SB_recent / SB_MSY,sb_recent_sbmsy,discrete axes as factors,arm (exclude - include),88,0.242643,0.0728934,0.0973329,0.387954,0.001377,0.6772,1.52108
+SB_recent / SB_MSY,sb_recent_sbmsy,arm x K interaction,arm:K,88,-1.47705,0.909239,-3.28649,0.332391,0.1082,0.6291,1.52108
+SB_recent (kt),sb_recent_kt,continuous axes,arm (exclude - include),88,173.776,52.4554,69.4058,278.145,0.001382,0.5804,518.188
+SB_recent (kt),sb_recent_kt,discrete axes as factors,arm (exclude - include),88,166.649,54.6529,57.7009,275.598,0.003209,0.6403,518.188
+SB_recent (kt),sb_recent_kt,arm x K interaction,arm:K,88,-1691.31,660.348,-3005.44,-377.175,0.01231,0.6122,518.188
+aggregate F (plot.rep),agg_F,continuous axes,arm (exclude - include),80,-0.0126843,0.00391852,-0.0204939,-0.0048747,0.001818,0.4872,0.0631211
+aggregate F (plot.rep),agg_F,discrete axes as factors,arm (exclude - include),80,-0.0134889,0.00411791,-0.0217153,-0.0052624,0.001704,0.546,0.0631211
+aggregate F (plot.rep),agg_F,arm x K interaction,arm:K,80,0.0608083,0.0501504,-0.0391647,0.160781,0.2293,0.4975,0.0631211
+F_recent / F_MSY,f_recent_fmsy,conditioning on mean priored X-hat,arm (exclude - include),80,0.292953,0.0469373,0.199385,0.386521,2.676e-08,0.8469,shrinkage -322.7% from -0.1315 to 0.293
+F_recent / F_MSY,f_recent_fmsy,X-hat coefficient (same fit),X_priored_mean,80,-7.58859,0.746992,-9.07769,-6.09948,1.511e-15,0.8469,"implied indirect (total - direct) = -0.4245, 323% of the total -0.1315"
+SB_recent / SB_0 (depletion),sb_recent_sb0,conditioning on mean priored X-hat,arm (exclude - include),80,-0.128917,0.0216493,-0.172074,-0.0857596,8.72e-08,0.7524,shrinkage -376.7% from 0.04659 to -0.1289
+SB_recent / SB_0 (depletion),sb_recent_sb0,X-hat coefficient (same fit),X_priored_mean,80,3.13756,0.344543,2.45073,3.8244,1.324e-13,0.7524,"implied indirect (total - direct) = 0.1755, 377% of the total 0.04659"
+SB_recent / SB_MSY,sb_recent_sbmsy,conditioning on mean priored X-hat,arm (exclude - include),80,-0.629209,0.122129,-0.872669,-0.38575,2.164e-06,0.774,shrinkage -402.5% from 0.208 to -0.6292
+SB_recent / SB_MSY,sb_recent_sbmsy,X-hat coefficient (same fit),X_priored_mean,80,14.9666,1.94365,11.092,18.8412,5.555e-11,0.774,"implied indirect (total - direct) = 0.8372, 403% of the total 0.208"
+SB_recent (kt),sb_recent_kt,conditioning on mean priored X-hat,arm (exclude - include),80,-520.181,87.4538,-694.517,-345.845,8.962e-08,0.8007,shrinkage -449.0% from 149.1 to -520.2
+SB_recent (kt),sb_recent_kt,X-hat coefficient (same fit),X_priored_mean,80,11964.3,1391.8,9189.79,14738.8,1.181e-12,0.8007,"implied indirect (total - direct) = 669.2, 449% of the total 149.1"
+aggregate F (plot.rep),agg_F,conditioning on mean priored X-hat,arm (exclude - include),80,0.0305915,0.00649614,0.0176416,0.0435413,1.176e-05,0.7116,shrinkage -341.2% from -0.01268 to 0.03059
+aggregate F (plot.rep),agg_F,X-hat coefficient (same fit),X_priored_mean,80,-0.773655,0.103384,-0.979747,-0.567563,1.408e-10,0.7116,"implied indirect (total - direct) = -0.04328, 341% of the total -0.01268"

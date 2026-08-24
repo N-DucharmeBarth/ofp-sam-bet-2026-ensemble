@@ -1,0 +1,605 @@
+<title>Reporting-Rate Penalty Diagnosis</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ground:   #f3f6f7;
+    --surface:  #ffffff;
+    --plate:    #fcfcfb;
+    --ink:      #111a20;
+    --ink-2:    #48565f;
+    --ink-3:    #7c8990;
+    --rule:     #dde5e8;
+    --rule-2:   #eaf0f2;
+    --accent:   #1c5aa8;
+    --include:  #2a78d6;
+    --exclude:  #d4551f;
+    --pass:     #1f6f5c;
+    --pass-bg:  #e4f0ec;
+    --hold:     #8f5a0c;
+    --hold-bg:  #f6ecda;
+    --code-bg:  #eef3f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground:   #0e1418;
+      --surface:  #151d22;
+      --plate:    #e9ecec;
+      --ink:      #edf3f5;
+      --ink-2:    #a6b4bb;
+      --ink-3:    #79878e;
+      --rule:     #26333a;
+      --rule-2:   #1d272d;
+      --accent:   #6ba5ea;
+      --include:  #3987e5;
+      --exclude:  #ec7a49;
+      --pass:     #56b39a;
+      --pass-bg:  #14312a;
+      --hold:     #d7a349;
+      --hold-bg:  #33270f;
+      --code-bg:  #1b242a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground:   #0e1418;
+    --surface:  #151d22;
+    --plate:    #e9ecec;
+    --ink:      #edf3f5;
+    --ink-2:    #a6b4bb;
+    --ink-3:    #79878e;
+    --rule:     #26333a;
+    --rule-2:   #1d272d;
+    --accent:   #6ba5ea;
+    --include:  #3987e5;
+    --exclude:  #ec7a49;
+    --pass:     #56b39a;
+    --pass-bg:  #14312a;
+    --hold:     #d7a349;
+    --hold-bg:  #33270f;
+    --code-bg:  #1b242a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: Georgia, "Iowan Old Style", "Source Serif Pro", serif;
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 0 20px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  h1, h2, h3, .eyebrow, .chip, .stat-label, th, .fignote, .tag {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  code, .mono, td.num, .stat-value {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+
+  /* ---------- masthead ---------- */
+  header { padding: 72px 0 34px; }
+  .tag {
+    font-size: 11.5px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--accent); font-weight: 650; margin: 0 0 18px;
+  }
+  h1 {
+    font-size: clamp(30px, 5vw, 43px); line-height: 1.12; letter-spacing: -.021em;
+    font-weight: 680; margin: 0 0 16px; text-wrap: balance;
+  }
+  .standfirst {
+    font-size: 19px; color: var(--ink-2); margin: 0; max-width: 62ch;
+    text-wrap: pretty;
+  }
+  .meta {
+    margin: 26px 0 0; font-size: 13.5px; color: var(--ink-3);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  /* ---------- headline stats ---------- */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+    gap: 1px; background: var(--rule); border: 1px solid var(--rule);
+    border-radius: 3px; overflow: hidden; margin: 34px 0 8px;
+  }
+  .stat { background: var(--surface); padding: 17px 18px 15px; }
+  .stat-label {
+    font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 620; margin: 0 0 7px;
+  }
+  .stat-value {
+    font-size: clamp(21px, 2.1vw, 25px); font-weight: 600; letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums; line-height: 1.1; margin: 0;
+    white-space: nowrap;
+  }
+  .stat-sub { font-size: 12.5px; color: var(--ink-3); margin: 5px 0 0; line-height: 1.4; }
+
+  /* ---------- sections with a task rail ---------- */
+  section { margin: 54px 0 0; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 620; margin: 0 0 9px;
+    padding-bottom: 9px; border-bottom: 1px solid var(--rule);
+  }
+  .eyebrow b { color: var(--accent); font-weight: 700; }
+  h2 {
+    font-size: 25px; line-height: 1.22; letter-spacing: -.018em;
+    font-weight: 660; margin: 0 0 4px; text-wrap: balance;
+  }
+  h3 {
+    font-size: 16px; letter-spacing: -.005em; font-weight: 640;
+    margin: 34px 0 2px; text-wrap: balance;
+  }
+  p { margin: 14px 0; max-width: 68ch; text-wrap: pretty; }
+  ul { margin: 14px 0; padding-left: 20px; max-width: 68ch; }
+  li { margin: 9px 0; }
+  strong { font-weight: 700; }
+  a { color: var(--accent); }
+
+  code {
+    font-size: .855em; background: var(--code-bg); color: var(--ink);
+    padding: 1.5px 5px; border-radius: 3px;
+  }
+  .arm-i { color: var(--include); font-weight: 700; font-style: normal; }
+  .arm-e { color: var(--exclude); font-weight: 700; font-style: normal; }
+
+  /* ---------- the tripwire chips ---------- */
+  .check {
+    display: grid; grid-template-columns: auto 1fr; gap: 5px 11px;
+    align-items: baseline; background: var(--surface);
+    border: 1px solid var(--rule); border-left: 3px solid var(--pass);
+    border-radius: 3px; padding: 12px 15px; margin: 15px 0;
+  }
+  .check.hold { border-left-color: var(--hold); }
+  .check .chip {
+    font-size: 10px; letter-spacing: .085em; text-transform: uppercase;
+    font-weight: 680; padding: 3px 8px; border-radius: 20px; white-space: nowrap;
+    color: var(--pass); background: var(--pass-bg);
+  }
+  .check.hold .chip { color: var(--hold); background: var(--hold-bg); }
+  .check code {
+    background: none; padding: 0; font-size: 12.5px; color: var(--ink-2);
+    word-break: break-word;
+  }
+  .check p {
+    grid-column: 1 / -1; margin: 2px 0 0; font-size: 14px;
+    color: var(--ink-2); line-height: 1.5; max-width: none;
+  }
+
+  /* ---------- code block ---------- */
+  pre {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 3px;
+    padding: 15px 17px; overflow-x: auto; margin: 18px 0;
+    font-size: 12.5px; line-height: 1.62; color: var(--ink-2);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  pre b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- tables ---------- */
+  .scroll { overflow-x: auto; margin: 20px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
+  th {
+    text-align: left; font-size: 10.5px; letter-spacing: .075em;
+    text-transform: uppercase; color: var(--ink-3); font-weight: 640;
+    padding: 0 14px 8px 0; border-bottom: 1px solid var(--rule); white-space: nowrap;
+  }
+  td {
+    padding: 9px 14px 9px 0; border-bottom: 1px solid var(--rule-2);
+    color: var(--ink-2); vertical-align: baseline;
+  }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  td.lead { color: var(--ink); }
+  tbody tr:last-child td { border-bottom: none; }
+  .up { color: var(--exclude); font-weight: 700; }
+
+  /* ---------- figures ---------- */
+  figure { margin: 26px 0; }
+  figure img {
+    display: block; width: 100%; height: auto; border-radius: 3px;
+    border: 1px solid var(--rule); background: var(--plate); padding: 6px;
+  }
+  figcaption {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 13px; color: var(--ink-3); margin-top: 10px;
+    line-height: 1.5; max-width: 68ch;
+  }
+
+  /* ---------- closing panel ---------- */
+  .panel {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 6px 24px 22px; margin: 22px 0;
+  }
+  .panel h3:first-child { margin-top: 20px; }
+
+  footer {
+    margin: 60px 0 0; padding-top: 22px; border-top: 1px solid var(--rule);
+    font-size: 13px; color: var(--ink-3);
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+  @media (max-width: 620px) {
+    body { font-size: 16px; padding: 0 16px 64px; }
+    header { padding: 44px 0 26px; }
+  }
+
+  /* ---------- print / PDF ----------
+     Paper is always light, whatever the viewer's theme. The selector list
+     matches the specificity of the [data-theme] block above and sits after it,
+     so it wins in every theme state. */
+  @media print {
+    :root, :root[data-theme="dark"], :root[data-theme="light"] {
+      color-scheme: light;
+      --ground:   #ffffff;
+      --surface:  #ffffff;
+      --plate:    #ffffff;
+      --ink:      #10171c;
+      --ink-2:    #3d4a53;
+      --ink-3:    #6c7980;
+      --rule:     #c9d4d9;
+      --rule-2:   #e2e9ec;
+      --accent:   #14508f;
+      --include:  #1b5fb5;
+      --exclude:  #b8460f;
+      --pass:     #1a5e4e;
+      --pass-bg:  #eaf3f0;
+      --hold:     #7a4c08;
+      --hold-bg:  #f8f0e0;
+      --code-bg:  #f0f4f6;
+    }
+    @page { size: A4; margin: 16mm 15mm 18mm; }
+
+    body { font-size: 10.2pt; line-height: 1.5; padding: 0; }
+    .wrap { max-width: none; }
+    p, ul, li { max-width: none; orphans: 3; widows: 3; }
+
+    header { padding: 0 0 14px; }
+    h1 { font-size: 23pt; }
+    .standfirst { font-size: 11.5pt; }
+    h2 { font-size: 15pt; }
+    h3 { font-size: 11pt; margin-top: 18px; }
+    section { margin-top: 26px; }
+
+    /* keep every self-contained unit whole on one page */
+    figure, .check, .stat, pre, table, .panel { break-inside: avoid; }
+    h1, h2, h3, .eyebrow { break-after: avoid; }
+    .eyebrow + h2 { break-before: avoid; }
+    thead { display: table-header-group; }
+    tr { break-inside: avoid; }
+
+    .stats { break-inside: avoid; margin: 20px 0 6px; }
+    /* narrower columns on paper wrap some labels to two lines; reserve the
+       second line everywhere so the four values stay on one baseline */
+    .stat-label { min-height: 2.4em; }
+    .stat-value { font-size: 15pt; }
+    figure img { padding: 0; border-color: var(--rule); }
+    .scroll { overflow-x: visible; }
+    table { min-width: 0; font-size: 8.8pt; }
+    pre { font-size: 8.4pt; }
+    .check code { font-size: 8.6pt; }
+    .check p { font-size: 9.4pt; }
+    footer { break-inside: avoid; margin-top: 30px; }
+  }
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="tag">BET 2026 ensemble · objective diagnostics</p>
+  <h1>What the reporting-rate flag actually does to the tag penalty</h1>
+  <p class="standfirst">The <code>RR (tag reporting)</code> grid axis moves the tagged-fish
+  reporting-rate penalty by a median of roughly 38 units. This traces that gap to its
+  source in the MFCL objective, tests whether M0 explains it, and asks whether the
+  <span class="arm-i">include</span> arm's low penalties are earned or censored.</p>
+  <p class="meta">80 retained PARs · 88 retained models · {{N_PASS}} of {{N_CHECKS}} checks held</p>
+</header>
+
+<div class="stats">
+  <div class="stat">
+    <p class="stat-label">Max residual</p>
+    <p class="stat-value">{{MAX_RESID}}</p>
+    <p class="stat-sub">reconstruction vs reported,<br>all 80 members · tolerance 1 × 10⁻⁶</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Adjusted arm effect</p>
+    <p class="stat-value">+{{ARM_EFFECT}}</p>
+    <p class="stat-sub">exclude − include, 95% CI<br>[{{ARM_LO}}, {{ARM_HI}}]</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Raw medians</p>
+    <p class="stat-value">{{MED_INC}} / {{MED_EXC}}</p>
+    <p class="stat-sub">include (n={{N_INC}}) vs exclude (n={{N_EXC}})</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Checks</p>
+    <p class="stat-value">{{N_PASS}} / {{N_FAIL}}</p>
+    <p class="stat-sub">held / did not hold<br>all four listed below</p>
+  </div>
+</div>
+
+<p style="font-size:14px;color:var(--ink-3);margin-top:14px;max-width:68ch;">
+Every directional claim below is followed by the named check that backs it. Checks that
+did not hold are shown in the same form, not paraphrased away — three of the four are
+results rather than defects.</p>
+
+<!-- ============================================================ -->
+<section>
+  <p class="eyebrow">Arithmetic · <b>Task 3</b> · gates everything downstream</p>
+  <h2>The penalty is reproduced exactly</h2>
+
+  <p>The formula is transcribed from <code>multifan-cl</code> <code>src/callpen.cpp</code>,
+  not inferred. The branch taken is the one guarded by <code>age_flags(198) != 0</code>,
+  which is 1 in all 80 PARs:</p>
+
+<pre>for i in 1..num_tag_releases+1, j in 1..num_fisheries:
+    if gflag[group(i,j)] == 0 <b>and tag_fish_rep_penalty(i,j) &gt; 0</b>:
+        gflag[group(i,j)] = 1
+        xy += tag_fish_rep_penalty(i,j)
+              * square(tag_fish_rep(i,j) - tag_fish_rep_target(i,j)<b>/100</b>)</pre>
+
+  <p>Weight multiplies, scale is proportion, and the sum runs over unique group ids —
+  each taken at the first cell in row-major order with a positive penalty.</p>
+
+  {{CHECK:task3.reconstruction-matches-reported}}
+
+  <h3>Three structural corrections</h3>
+  <ul>
+    <li><strong>The selector is the penalty matrix, not the active flags.</strong>
+    <code>tag_fish_rep_active_flags</code> governs which rates are <em>estimated</em>;
+    <code>tag_fish_rep_penalty</code> governs which carry a prior. Here the two sets
+    coincide, so nothing changes numerically — but the code must select on the penalty.</li>
+    <li><strong>Five groups carry an informative prior, not three.</strong> There are three
+    distinct priors, each shared between an RTTP group and a PTTP/pooled group.</li>
+    <li><strong>Group 18 is <code>PS.EAST.3</code>, not region 4.</strong> The three priors
+    are region-2 PS, region-3-west PS and region-3-east PS.</li>
+  </ul>
+
+  <h3>A stop condition fired, and it is not one</h3>
+  <p><code>tag_flags(:,2)</code> is <strong>not constant within a PAR</strong> in 26 of 80
+  members. It is a per-release-group flag, and the design deliberately forces face-value
+  removal on release groups whose mixing window is zero — <span class="arm-i">include</span>
+  is undefined when there is no window to raise. The carve-out is exact, and the arm label
+  read off the groups that <em>do</em> have a window agrees with the design table for all 80.</p>
+
+  {{CHECK:task1.flag2-exceptions-are-exactly-zero-mixing-groups}}
+  {{CHECK:task1.arm-label-agrees-with-design}}
+
+  <p>The stop condition needs restating as <em>&ldquo;not constant across release groups
+  with a mixing window&rdquo;</em>.</p>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <p class="eyebrow">Empirical · <b>Task 4</b> · the confound check</p>
+  <h2>M0 does not explain the gap</h2>
+
+  <p>M0 has a far tighter relationship with this penalty than the flag axis does, and these
+  are selected models rather than a fully crossed grid — so the first question is whether
+  M0 is leaking in. It is not. The standardised mean difference between arms is
+  <strong>−0.076</strong>, and adding M0 to the model <em>raises</em> the arm coefficient
+  from 33.98 to 35.54 while R² climbs from 0.454 to 0.852. M0 is a strong predictor
+  (≈ 1558 per unit quarterly M, p ≈ 1 × 10⁻²⁴) but orthogonal to the arm: it explains
+  scatter, not the gap.</p>
+
+  {{CHECK:task4.M0-balanced-across-arms}}
+  {{CHECK:task4.arm-effect-robust-to-adding-M0}}
+  {{CHECK:task4.adjusted-arm-effect-positive}}
+
+  <p>Quote the adjusted estimate, not the violin medians. On the log scale the same fit
+  gives +0.526 [0.430, 0.622] — the <span class="arm-e">exclude</span> arm carries about
+  <strong>1.69×</strong> the penalty. Treating tau, K and effort creep as factors instead
+  of continuous moves the estimate to +36.5, so the scale choice does not matter.</p>
+
+  <h3>One balance check did not hold</h3>
+  {{CHECK:task4.K-balanced-across-arms}}
+  <p>K is materially imbalanced at K = 0.20 — include 7/41, exclude 16/47. K is in every
+  adjusted model and the adjusted estimate is larger than the unadjusted one, so the
+  imbalance does not manufacture the effect. It is reported because it is real.</p>
+
+  <figure>
+    <img src="{{FIG_BALANCE}}" alt="Four panels comparing the distribution of K, tau, effort creep and M0 between the include and exclude arms. M0 is closely matched; K is visibly imbalanced at 0.20.">
+    <figcaption>Balance of the other grid axes across the arms. M0 (right) overlaps almost
+    completely — the candidate confound is not one. K (left) is the axis that does not
+    balance.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <p class="eyebrow">Empirical · <b>Task 5</b> · direction and magnitude</p>
+  <h2>Larger excursions under exclude, and upward in both arms</h2>
+
+  <p>The prediction is about <strong>magnitude, not sign</strong>. It holds for every
+  priored group, and the deviation is <em>upward</em> in both arms — nothing here supports
+  a downward push.</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr>
+      <th>Group</th><th>Prior</th><th>Weight</th>
+      <th class="num">|dev| include</th><th class="num">|dev| exclude</th>
+      <th class="num">Diff</th><th class="num">MWU p</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="lead">7 · RTTP PS.2</td><td class="num">0.4962</td><td class="num">354.5</td>
+          <td class="num">0.0276</td><td class="num">0.1693</td><td class="num up">+0.1417</td><td class="num">2.8e−14</td></tr>
+      <tr><td class="lead">10 · RTTP PS.WEST.3</td><td class="num">0.5121</td><td class="num">739.2</td>
+          <td class="num">0.0672</td><td class="num">0.0763</td><td class="num">+0.0091</td><td class="num">0.028</td></tr>
+      <tr><td class="lead">14 · PTTP PS.2</td><td class="num">0.4962</td><td class="num">354.5</td>
+          <td class="num">0.0054</td><td class="num">0.0061</td><td class="num">+0.0007</td><td class="num">0.079</td></tr>
+      <tr><td class="lead">17 · PTTP PS.WEST.3</td><td class="num">0.5121</td><td class="num">739.2</td>
+          <td class="num">0.2562</td><td class="num">0.2706</td><td class="num">+0.0144</td><td class="num">0.146</td></tr>
+      <tr><td class="lead">18 · PTTP PS.EAST.3</td><td class="num">0.5282</td><td class="num">231.2</td>
+          <td class="num">0.2864</td><td class="num">0.3722</td><td class="num up">+0.0857</td><td class="num">5.3e−05</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  {{CHECK:task5.exclude-has-larger-abs-excursion-pooled-priored}}
+  {{CHECK:task5.sign-preserved-across-arms-g18}}
+
+  <figure>
+    <img src="{{FIG_EXCURSION}}" alt="Left: dot plot of absolute excursion from the prior for each of the five priored groups, split by arm; exclude sits further right in every group. Right: bar chart of median penalty contribution by group and arm.">
+    <figcaption>Absolute excursion from the prior (left) and penalty contribution (right)
+    for the five priored groups. Group 7 is the clearest single signal: its median estimate
+    moves from 0.524 — essentially at its 0.496 prior — to 0.666.</figcaption>
+  </figure>
+
+  <h3>The arm gap is not group 17</h3>
+  {{CHECK:task5.arm-gap-dominated-by-group-17}}
+  <p>This is a result, not a nuisance. Group 17 dominates the <em>level</em> of the penalty
+  — 68% of the include-arm median, 53% of the exclude-arm median — but supplies only 19% of
+  the arm <em>gap</em>. The gap comes from group 18 and group 7. Level and gap are answered
+  by different parameters, and the brief's expectation was built on the level.</p>
+
+  {{CHECK:task5.weight-1-share-under-2pc-in-every-member}}
+  <p>The weight-1 groups contribute a median 0.78% of the total penalty but up to 3.6% in
+  the worst member — under 5% everywhere, so the tight screen fails while the substance
+  holds. The story is about five parameters, and effectively about three.</p>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <p class="eyebrow">Empirical · <b>Task 6</b> · the mechanism</p>
+  <h2>The gap scales with the mixing window</h2>
+
+  <p>The realised mixing configuration does what the axis label implies: median
+  release-weighted mean mixing period falls from 3.53 periods at K = 0.05 to 0.84 at
+  K = 0.35, and the count of zero-mixing release groups rises from 0 to 18.</p>
+
+  {{CHECK:task6.mixing-window-decreases-monotonically-with-K}}
+  {{CHECK:task6.arm-gap-shrinks-with-K}}
+  {{CHECK:task6.arm-gap-grows-with-mean-mixing-period}}
+
+  <figure>
+    <img src="{{FIG_ARM_GAP}}" alt="Left: median penalty against K for both arms; exclude sits above include until the two cross at K equals 0.35. Right: bar chart of the arm gap by K, positive at every level except 0.35.">
+    <figcaption>Median penalty by mixing cutoff (left) and the arm gap at each level (right).
+    The gap runs +49 at K = 0.05 down to −19 at K = 0.35, where only five models sit.</figcaption>
+  </figure>
+
+  <h3>Confirmed in the source, not just inferred</h3>
+  <p><code>src/tag3.cpp</code> switches on <code>tag_flags(it,2)</code> <strong>only inside
+  the mixing window</strong>:</p>
+
+<pre>tag_flags(it,2)==0  →  actual_tag_catch = tot_tag_catch / (1e-6 + tag_rep_rate)   <b>[include]</b>
+tag_flags(it,2)==1  →  actual_tag_catch = tot_tag_catch                          <b>[exclude]</b></pre>
+
+  <p>Under <span class="arm-i">include</span> the mixing-period removal falls as
+  <code>X_f</code> rises, so the surviving cohort — and with it the predicted post-mixing
+  returns — increases with <code>X_f</code> on top of the direct scaling. That is the second
+  lever, and it exists only where a mixing window exists. No window, no lever: exactly the
+  K = 0.35 end where the gap vanishes.</p>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <p class="eyebrow">Empirical · <b>Task 7</b> · where the mechanism stops</p>
+  <h2>ψ̂ does not order the effect across groups</h2>
+
+  <p>Across the five priored groups, Spearman's rho between in-window recapture share and
+  the arm difference in median |dev| is <strong>+0.10</strong>; across all twelve penalised
+  groups it is <strong>−0.13</strong>. The sign check passes, but at n = 5 it carries almost
+  no information and should not be read as support.</p>
+
+  {{CHECK:task7.highest-psi-group-shows-larger-excursion-difference-than-lowest}}
+
+  <p>The extremes line up — highest ψ̂ (group 7, 0.994) has the largest excursion difference,
+  lowest ψ̂ (group 17, 0.349) nearly the smallest — but the middle does not. Group 18
+  (ψ̂ = 0.406) shows +0.086 while group 14 (ψ̂ = 0.833) shows +0.0007. Group 14 has
+  <strong>6</strong> recaptured fish against group 18's <strong>3117</strong>, so recapture
+  volume, not in-window share, is what separates them.</p>
+
+  <p><strong>Read this as: the mechanism holds at the member level and does not distribute
+  across groups in proportion to their in-window share.</strong> Reported descriptively;
+  no model is fitted to n = 5.</p>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <p class="eyebrow">Empirical · <b>Task 8</b> · censoring screens</p>
+  <h2>Both screens cut against include</h2>
+
+  <h3>Reporting-rate bound</h3>
+  <p><code>parest_flags(33) = 99</code> in every member, so <code>tag_fish_rep</code> is
+  bounded at <strong>0.99</strong>.</p>
+
+  {{CHECK:task8.include-arm-not-more-often-at-the-rr-bound}}
+
+  <p>Two of 34 <span class="arm-i">include</span> members have a priored group pinned within
+  1e−3 of the bound — both group 18 at 0.990 — against none of the 46
+  <span class="arm-e">exclude</span> members. Small, but one-directional: part of the include
+  arm's low tail is truncation rather than fit.</p>
+
+  <h3>Survival floor</h3>
+  <p><code>src/tag3.cpp</code> floors survival with <code>posfun</code> once
+  <code>surv_rate = 1 − raised_removal / tags_present ≤ 0.22</code>. Because the raised
+  removal is <code>reported / X_f</code>, only the <span class="arm-i">include</span> arm
+  can drive it.</p>
+
+  {{CHECK:task8.floor-engagement-higher-under-include}}
+  {{CHECK:task8.lowest-penalty-include-members-are-more-floor-engaging}}
+
+  <p>Minimum proxy survival reaches <strong>−2.98</strong> under include against 0.42 under
+  exclude. Release groups flagged: <strong>98</strong> (the pooled group, in all 34 include
+  members), <strong>21</strong> (14 members), 15 (6) and 5 (1).</p>
+
+  {{CHECK:task8.discarded-release-groups-appear-in-floor-screen}}
+
+  <p>MFCL <strong>discards the posfun penalty outright</strong> for release groups 21, 72 and
+  112 — <code>switch (it) { case 72: case 21: case 112: break; default: _ffpen+=ffpen; }</code>
+  — so 14 of the 55 member × release-group flags accrue no penalty at all.</p>
+
+  <p style="font-size:14px;color:var(--ink-3);">The floor screen is a <code>bet.tag</code>-only
+  proxy, deliberately conservative: it ignores natural mortality, tag shedding and the
+  per-region evaluation, all of which would make engagement more likely. A flagged group is a
+  strong candidate; an unflagged one is not cleared.</p>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <p class="eyebrow">Interpretation</p>
+  <h2>What this does and does not license</h2>
+
+  <div class="panel">
+    <h3>The flag axis does real, localised work</h3>
+    <p>Adjusted effect +{{ARM_EFFECT}} [{{ARM_LO}}, {{ARM_HI}}] penalty units, robust to M0,
+    scaling with the mixing window exactly as an extra-lever account predicts.</p>
+
+    <h3>A lower penalty is not a better model</h3>
+    <p>The <span class="arm-i">include</span> arm's extra lever is an accounting identity —
+    the same observations differentiated twice — not new information. Both censoring screens
+    then push the same way: include is the only arm that can hit the survival floor, it does
+    so in every member, it does so most in its own lowest-penalty members, and part of that
+    floor penalty is discarded outright for release group 21. Its small penalties are partly
+    cushioned rather than earned. This component is not evidence for
+    <span class="arm-i">include</span>.</p>
+
+    <h3>The mechanism is confirmed at member level, not group level</h3>
+    <p>Task 6 passes decisively; Task 7 does not. Any account of <em>why</em> particular
+    reporting-rate groups move needs something beyond in-window share — recapture volume is
+    the obvious candidate, and is untested here.</p>
+
+    <h3>Not tested</h3>
+    <p>Whether the arm difference in this component propagates to management quantities.
+    Nothing here speaks to that.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Analysis code: <code>analysis/rr-penalty/</code>, reproduced by
+  <code>analysis/rr-penalty/run-all.sh</code>. Tidy CSVs, figures and the full check log
+  in <code>out/</code>. Objective components and the design table cover all 88 retained
+  models; only 80 have a retained <code>final.par</code>, so Tasks 5–8 run on those 80 —
+  the arm effect is 35.5 on 88 and 34.3 on 80.</p>
+</footer>
+
+</div>

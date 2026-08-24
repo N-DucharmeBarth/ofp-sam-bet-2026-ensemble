@@ -1,0 +1,4 @@
+scheme,n_members_all,psi_release_weighted_median_all,psi_release_weighted_range_all,n_groups_psi_ge_0p3_median_all,release_share_psi_ge_0p3_median_all,n_members_exclude_arm,psi_release_weighted_median_exclude_arm,n_groups_psi_ge_0p3_median_exclude_arm,release_share_psi_ge_0p3_median_exclude_arm
+1. exclude-arm fitted rates (as published),80,0.409055,0.2208-0.7735,63,0.588518,46,0.409055,63,0.588518
+2. include-arm fitted rates,80,0.407125,0.2189-0.7709,62,0.585661,46,0.407125,62,0.585661
+3. tag-seeding prior means (external anchor),80,0.413743,0.2225-0.786,62,0.586411,46,0.413743,62,0.586411

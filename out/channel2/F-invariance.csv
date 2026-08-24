@@ -1,0 +1,8 @@
+quantity,column,n_unique_overall,n_members,max_unique_within_member,max_rel_spread_within_member
+F / F_MSY,agg_F_Fmsy,3,3,1,0.0
+aggregate F,agg_F,3,3,1,0.0
+SB / SB_MSY,SB_SBmsy,3,3,1,0.0
+SB recent,SB_recent,3,3,1,0.0
+MSY,MSY,3,3,1,0.0
+F at MSY,F_at_MSY,3,3,1,0.0
+total objective (control),objective,168,3,56,1.9350306717170913

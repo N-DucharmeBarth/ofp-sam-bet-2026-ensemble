@@ -4,3 +4,19 @@ __pycache__/
 *.pyc
 retained-final-pars/
 bet-2026-ensemble-retained-final-pars-*.tar.gz
+
+# reporting-rate penalty analysis: parsed-par cache
+analysis/rr-penalty/.par-cache.pkl
+
+# stray files MFCL writes into its working directory
+XXX
+argv
+argv1
+error.log
+fmin.log
+
+# raw per-run MFCL stdout from the Experiment A/B batch: extremely verbose
+# (full ADMB diagnostic chatter, tens of MB by the time a run finishes) and
+# growing continuously while the batch runs. status.log, memory.log and the
+# eventual structured CSV outputs stay tracked; these do not.
+out/channel2/experiments/*.log

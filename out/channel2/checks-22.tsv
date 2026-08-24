@@ -1,0 +1,6 @@
+PASS	task12.length_total-flat-under-X-sweep	max range across the sweep = 0 objective units (112 evaluations, tolerance 1e-6)
+PASS	task12.age_length_total-flat-under-X-sweep	max range across the sweep = 0 objective units (112 evaluations, tolerance 1e-6)
+PASS	task12.survey_index_total-flat-under-X-sweep	max range across the sweep = 0 objective units (112 evaluations, tolerance 1e-6)
+PASS	task12.catch_total-flat-under-X-sweep	max range across the sweep = 0 objective units (112 evaluations, tolerance 1e-6)
+PASS	task12.tag-terms-do-move-as-a-contrast	tag_mix range per (member,group,arm) spans 25.6 to 770 -- confirms the sweep itself is doing something, not just evaluating a dead parameter
+PASS	task12.no-strong-cross-member-correlation-with-other-components	largest |pooled correlation| between a priored group rate deviation from its tag-seeding target and length/age-length/survey-index fit = 0.256 (group 14, age-length); largest single by-arm correlation = 0.395 (group 18, age-length, include arm); n=80 members; catch_total excluded, exactly 0 for all 88 retained models so has no variance to correlate against; threshold 0.5 chosen as a conservative worth-a-closer-look line, not a formal test

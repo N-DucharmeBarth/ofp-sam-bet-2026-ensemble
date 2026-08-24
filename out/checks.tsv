@@ -1,0 +1,48 @@
+PASS	task1.dims-constant-across-members	{(98, 33, 99)}
+PASS	task1.group-count-constant	max group id {31}
+PASS	task1.arm-label-agrees-with-design	
+PASS	task1.flag2-exceptions-are-exactly-zero-mixing-groups	under `include`, tag_flags(:,2)=1 iff tag_flags(:,1)=0
+PASS	task2.group-cells-carry-identical-value-target-weight	across all cells of a group with penalty > 0
+PASS	task2.penalised-groups-are-a-subset-of-active-groups	penalised=[1, 6, 7, 10, 13, 14, 17, 18, 19, 20, 23, 29] active=[1, 6, 7, 10, 13, 14, 17, 18, 19, 20, 23, 29]
+PASS	task3.reconstruction-matches-reported	max|resid| = 4.86e-10 (tol 1e-06); median resid = 2.32e-12
+PASS	task4.M0-balanced-across-arms	standardised mean difference (exclude - include) = -0.076
+PASS	task4.h-balanced-across-arms	standardised mean difference = -0.198
+FAIL	task4.K-balanced-across-arms	largest level-share difference = 0.170
+PASS	task4.tau-balanced-across-arms	largest level-share difference = 0.025
+PASS	task4.creep-balanced-across-arms	largest level-share difference = 0.106
+PASS	task4.arm-effect-robust-to-adding-M0	arm coef 33.98 -> 35.54 on adding M0 (+4.6%)
+PASS	task4.adjusted-arm-effect-positive	adjusted arm effect (exclude - include) = 35.54 [28.72, 42.36]
+PASS	task4.adjusted-effect-not-much-smaller-than-raw-median-gap	adjusted 35.54 vs raw median gap 38.31
+PASS	task5.priors-constant-across-members	
+PASS	task5.exclude-has-larger-abs-excursion-g7	median |dev|: include 0.02761 -> exclude 0.1693 (diff +0.1417, MWU p=2.83e-14)
+PASS	task5.exclude-has-larger-abs-excursion-g10	median |dev|: include 0.06721 -> exclude 0.07629 (diff +0.009073, MWU p=0.0282)
+PASS	task5.exclude-has-larger-abs-excursion-g14	median |dev|: include 0.005388 -> exclude 0.006112 (diff +0.0007245, MWU p=0.079)
+PASS	task5.exclude-has-larger-abs-excursion-g17	median |dev|: include 0.2562 -> exclude 0.2706 (diff +0.01436, MWU p=0.146)
+PASS	task5.exclude-has-larger-abs-excursion-g18	median |dev|: include 0.2864 -> exclude 0.3722 (diff +0.08572, MWU p=5.26e-05)
+PASS	task5.exclude-has-larger-abs-excursion-pooled-priored	median |dev| include 0.06721 vs exclude 0.1687
+PASS	task5.sign-preserved-across-arms-g7	median signed dev include +0.02761, exclude +0.1693
+PASS	task5.sign-preserved-across-arms-g10	median signed dev include +0.06721, exclude +0.07629
+PASS	task5.sign-preserved-across-arms-g14	median signed dev include +0.005388, exclude +0.006112
+PASS	task5.sign-preserved-across-arms-g17	median signed dev include +0.2562, exclude +0.2706
+PASS	task5.sign-preserved-across-arms-g18	median signed dev include +0.2864, exclude +0.3722
+FAIL	task5.weight-1-share-under-2pc-in-every-member	max share of total penalty from weight-1 groups = 0.03635 (median 0.007791, 90th pct 0.01787)
+PASS	task5.weight-1-share-under-5pc-in-every-member	max = 0.03635, median = 0.007791
+FAIL	task5.arm-gap-dominated-by-group-17	group 17 supplies 19.3% of the median total-penalty arm gap; group 18 supplies 45.0% and group 7 34.1%
+PASS	task5.arm-gap-concentrated-in-priored-groups	priored groups supply 101.7% of the median arm gap
+PASS	task6.mixing-window-decreases-monotonically-with-K	median release-weighted mean mixing period by K is monotone decreasing; Spearman(K, mean mixing) = -1.0000
+PASS	task6.zero-mixing-count-increases-with-K	Spearman(K, n zero-mixing groups) = +0.9977
+PASS	task6.arm-gap-shrinks-with-K	arm x K interaction on the raw penalty = -218 [-298.3, -137.7], p=7.74e-07
+PASS	task6.arm-by-K-interaction-distinguishable-from-zero	95% CI [-298.3, -137.7] excludes zero
+PASS	task6.arm-gap-grows-with-mean-mixing-period	arm x mean-mixing interaction = 21.11 [13.65, 28.56], p=3.09e-07
+PASS	task7.excursion-difference-tracks-in-window-share	Spearman rho = +0.1000 across n=5 priored groups (descriptive only; p=0.873 is not interpretable at n=5)
+PASS	task7.in-window-share-varies-across-priored-groups	psi ranges 0.349 to 0.994 across priored groups
+PASS	task7.excursion-difference-varies-across-priored-groups	arm difference in median |dev| ranges +0.0007 to +0.1417
+PASS	task7.highest-psi-group-shows-larger-excursion-difference-than-lowest	highest-psi group g7 (psi=0.994) d|dev|=+0.1417; lowest-psi group g17 (psi=0.349) d|dev|=+0.0144
+PASS	task8.upper-bound-constant-across-members	parest_flags(33) = {99} -> tag_fish_rep upper bound = {0.99}
+PASS	task8.age_flags(117)-unset-so-posfun-defaults-apply	{0}
+PASS	task8.age_flags(118)-unset-so-posfun-defaults-apply	{0}
+PASS	task8.age_flags(119)-unset-so-posfun-defaults-apply	{0}
+FAIL	task8.include-arm-not-more-often-at-the-rr-bound	priored-group bound hits: include 5.9% vs exclude 0.0% of members
+PASS	task8.floor-engagement-higher-under-include	share of members with >=1 engaging release group: include 100.0% vs exclude 0.0%
+PASS	task8.lowest-penalty-include-members-are-more-floor-engaging	lowest-penalty tercile 2.00 vs highest 1.36 engaging release groups; Spearman(penalty, n_engaging) = -0.588
+PASS	task8.discarded-release-groups-appear-in-floor-screen	of the groups whose posfun penalty MFCL discards (21, 72, 112), the screen flags [21]; 4 distinct release groups flagged overall

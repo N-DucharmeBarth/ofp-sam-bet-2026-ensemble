@@ -1,0 +1,12 @@
+model,response,formula,term,n,estimate,se,ci_lo,ci_hi,p_value,arm_main,r_squared
+arm * K,penalty,penalty ~ is_exclude * K + h + tau + creep + M0,is_exclude:K,80,-218.027,40.2736,-298.311,-137.742,7.737e-07,76.9941,0.8827
+arm * K,log(penalty),log_penalty ~ is_exclude * K + h + tau + creep + M0,is_exclude:K,80,-1.70798,0.576789,-2.85779,-0.558172,0.004148,0.796523,0.8418
+arm * mean mixing period,penalty,penalty ~ is_exclude * rel_wt_mean_mixing + h + tau + creep + M0,is_exclude:rel_wt_mean_mixing,80,21.1072,3.74007,13.6515,28.5628,3.086e-07,-1.52022,0.8848
+arm * mean mixing period,log(penalty),log_penalty ~ is_exclude * rel_wt_mean_mixing + h + tau + creep + M0,is_exclude:rel_wt_mean_mixing,80,0.144386,0.056339,0.0320757,0.256695,0.01247,0.230498,0.828
+arm gap by K (medians),penalty,median(exclude|K) - median(include|K),K=0.05,5,49.2427,,,,,"n_inc=2,n_exc=3",med_mix=3.533
+arm gap by K (medians),penalty,median(exclude|K) - median(include|K),K=0.1,10,44.8638,,,,,"n_inc=6,n_exc=4",med_mix=3.069
+arm gap by K (medians),penalty,median(exclude|K) - median(include|K),K=0.15,16,55.7535,,,,,"n_inc=8,n_exc=8",med_mix=2.327
+arm gap by K (medians),penalty,median(exclude|K) - median(include|K),K=0.2,23,16.823,,,,,"n_inc=7,n_exc=16",med_mix=1.472
+arm gap by K (medians),penalty,median(exclude|K) - median(include|K),K=0.25,12,35.1742,,,,,"n_inc=5,n_exc=7",med_mix=1.147
+arm gap by K (medians),penalty,median(exclude|K) - median(include|K),K=0.3,9,33.15,,,,,"n_inc=3,n_exc=6",med_mix=0.88
+arm gap by K (medians),penalty,median(exclude|K) - median(include|K),K=0.35,5,-19.2871,,,,,"n_inc=3,n_exc=2",med_mix=0.8403
